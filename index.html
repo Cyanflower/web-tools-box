@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Web Tools</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- 预先应用主题，防止闪烁 -->
+    <script>
+        // 尽早应用主题以防止闪烁
+        (function() {
+            try {
+                // 简化版的cookie读取函数
+                function getCookie(name) {
+                    const cookieName = name + "=";
+                    const decodedCookie = decodeURIComponent(document.cookie);
+                    const cookieArray = decodedCookie.split(';');
+                    
+                    for (let i = 0; i < cookieArray.length; i++) {
+                        let cookie = cookieArray[i];
+                        while (cookie.charAt(0) === ' ') {
+                            cookie = cookie.substring(1);
+                        }
+                        if (cookie.indexOf(cookieName) === 0) {
+                            return cookie.substring(cookieName.length, cookie.length);
+                        }
+                    }
+                    return null;
+                }
+
+                // 添加无过渡效果的类
+                document.documentElement.classList.add('no-transition');
+                
+                const savedTheme = getCookie('web_tools_theme');
+                
+                if (savedTheme === 'dark') {
+                    // 直接应用暗色主题到html元素
+                    document.documentElement.style.colorScheme = 'dark';
+                    document.documentElement.setAttribute('data-theme', 'dark');
+                } else if (savedTheme === 'auto') {
+                    // 检查系统主题
+                    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+                    if (prefersDark) {
+                        document.documentElement.style.colorScheme = 'dark';
+                        document.documentElement.setAttribute('data-theme', 'dark');
+                    }
+                }
+                
+                // 页面加载后移除无过渡效果类
+                window.addEventListener('load', function() {
+                    setTimeout(function() {
+                        document.documentElement.classList.remove('no-transition');
+                    }, 100);
+                });
+            } catch (e) {
+                // 出错不处理，让常规流程接管
+                console.error('预先应用主题失败：', e);
+            }
+        })();
+    </script>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo-container">
+                <h1 class="site-title">Web Tools</h1>
+                <p class="site-subtitle">便捷实用的在线工具集</p>
+            </div>
+            <div class="settings">
+                <div class="theme-toggle">
+                    <button id="theme-button" class="icon-button" aria-label="Theme Settings">
+                        <i class="fas fa-sun light-icon"></i>
+                        <i class="fas fa-moon dark-icon"></i>
+                    </button>
+                    <div class="theme-menu">
+                        <div class="menu-item">
+                            <span data-i18n="theme">Theme</span>
+                            <label class="switch">
+                                <input type="checkbox" id="theme-switch">
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                        <div class="menu-item auto-theme">
+                            <span class="switch-label" data-i18n="auto">Auto</span>
+                            <label class="switch">
+                                <input type="checkbox" id="auto-theme">
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                <button id="language-button" class="icon-button" aria-label="Language">
+                    <i class="fas fa-language"></i>
+                    <span class="lang-indicator">EN</span>
+                </button>
+            </div>
+        </header>
+        
+        <main>
+            <div class="hero-section">
+                <h2 class="hero-title" data-i18n="heroTitle">简单高效的在线工具集合</h2>
+                <p class="hero-description" data-i18n="heroDesc">为您的日常工作和生活提供便捷的在线工具，让复杂任务变得简单。</p>
+            </div>
+            
+            <div class="tools-grid">
+                <div class="tool-card" onclick="window.location.href='tools/markdown-image-extractor.html'">
+                    <div class="tool-icon"><i class="fas fa-image"></i></div>
+                    <h3 data-i18n="tool1">Tool 1</h3>
+                    <p data-i18n="tool1Desc">Tool 1 Description</p>
+                    <div class="card-overlay">
+                        <span class="card-action" data-i18n="useNow">立即使用</span>
+                    </div>
+                </div>
+                <div class="tool-card" onclick="window.location.href='tools/tool2.html'">
+                    <div class="tool-icon"><i class="fas fa-clock"></i></div>
+                    <h3 data-i18n="tool2">Tool 2</h3>
+                    <p data-i18n="tool2Desc">Tool 2 Description</p>
+                    <div class="card-overlay">
+                        <span class="card-action" data-i18n="useNow">立即使用</span>
+                    </div>
+                </div>
+                <div class="tool-card" onclick="window.location.href='tools/tool3.html'">
+                    <div class="tool-icon"><i class="fas fa-image"></i></div>
+                    <h3 data-i18n="tool3">Tool 3</h3>
+                    <p data-i18n="tool3Desc">Tool 3 Description</p>
+                    <div class="card-overlay">
+                        <span class="card-action" data-i18n="useNow">立即使用</span>
+                    </div>
+                </div>
+                <div class="tool-card" onclick="window.location.href='tools/tool4.html'">
+                    <div class="tool-icon"><i class="fas fa-file-alt"></i></div>
+                    <h3 data-i18n="tool4">Tool 4</h3>
+                    <p data-i18n="tool4Desc">Tool 4 Description</p>
+                    <div class="card-overlay">
+                        <span class="card-action" data-i18n="useNow">立即使用</span>
+                    </div>
+                </div>
+                <div class="tool-card" onclick="window.location.href='tools/tool5.html'">
+                    <div class="tool-icon"><i class="fas fa-code"></i></div>
+                    <h3 data-i18n="tool5">Tool 5</h3>
+                    <p data-i18n="tool5Desc">Tool 5 Description</p>
+                    <div class="card-overlay">
+                        <span class="card-action" data-i18n="useNow">立即使用</span>
+                    </div>
+                </div>
+                <div class="tool-card" onclick="window.location.href='tools/tool6.html'">
+                    <div class="tool-icon"><i class="fas fa-cogs"></i></div>
+                    <h3 data-i18n="tool6">Tool 6</h3>
+                    <p data-i18n="tool6Desc">Tool 6 Description</p>
+                    <div class="card-overlay">
+                        <span class="card-action" data-i18n="useNow">立即使用</span>
+                    </div>
+                </div>
+            </div>
+        </main>
+        
+        <footer>
+            <div class="footer-content">
+                <p>&copy; 2023 Web Tools | <span data-i18n="footerDesc">使用便捷的在线工具提高效率</span></p>
+                <div class="footer-links">
+                    <a href="#" data-i18n="about">关于我们</a>
+                    <a href="#" data-i18n="contact">联系我们</a>
+                    <a href="#" data-i18n="feedback">意见反馈</a>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <script src="js/cookies.js"></script>
+    <script src="js/theme.js"></script>
+    <script src="js/language.js"></script>
+    <script src="js/main.js"></script>
+</body>
+</html>

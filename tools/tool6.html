@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tool 6 - Web Tools</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .tool-content {
+            background-color: var(--card-bg);
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: var(--card-shadow);
+        }
+
+        .back-button {
+            margin-bottom: 20px;
+            display: inline-block;
+        }
+
+        .back-button a {
+            display: flex;
+            align-items: center;
+            color: var(--text-color);
+            text-decoration: none;
+            font-size: 1rem;
+        }
+
+        .back-button i {
+            margin-right: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1 class="site-title" data-i18n="tool6">Tool 6</h1>
+            <div class="settings">
+                <div class="theme-toggle">
+                    <button id="theme-button" class="icon-button" aria-label="Theme Settings">
+                        <i class="fas fa-sun light-icon"></i>
+                        <i class="fas fa-moon dark-icon"></i>
+                    </button>
+                    <div class="theme-menu">
+                        <div class="menu-item">
+                            <span data-i18n="theme">Theme</span>
+                            <label class="switch">
+                                <input type="checkbox" id="theme-switch">
+                                <span class="slider round"></span>
+                            </label>
+                        </div>
+                        <div class="menu-item">
+                            <span data-i18n="auto">Auto</span>
+                            <input type="checkbox" id="auto-theme">
+                        </div>
+                    </div>
+                </div>
+                <button id="language-button" class="icon-button" aria-label="Language">
+                    <i class="fas fa-language"></i>
+                    <span class="lang-indicator">EN</span>
+                </button>
+            </div>
+        </header>
+        
+        <main>
+            <div class="back-button">
+                <a href="../index.html">
+                    <i class="fas fa-arrow-left"></i>
+                    <span>Back to Home</span>
+                </a>
+            </div>
+
+            <div class="tool-content">
+                <h2 data-i18n="tool6">Tool 6</h2>
+                <p data-i18n="tool6Desc">Tool 6 Description - This is a placeholder for Tool 6. Actual tool content will be implemented later.</p>
+                
+                <!-- Tool-specific content goes here -->
+                <div class="placeholder" style="margin-top: 30px; text-align: center;">
+                    <i class="fas fa-cogs" style="font-size: 5rem; color: #2196F3; opacity: 0.5;"></i>
+                    <p style="margin-top: 20px;">Tool content coming soon...</p>
+                </div>
+            </div>
+        </main>
+        
+        <footer>
+            <p>&copy; 2023 Web Tools</p>
+        </footer>
+    </div>
+
+    <script src="../js/cookies.js"></script>
+    <script src="../js/theme.js"></script>
+    <script src="../js/language.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize theme manager
+            ThemeManager.init();
+            
+            // Initialize language manager
+            LanguageManager.init();
+            
+            // Add event stopPropagation for theme menu
+            const themeMenu = document.querySelector('.theme-menu');
+            if (themeMenu) {
+                themeMenu.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                });
+            }
+        });
+    </script>
+</body>
+</html>

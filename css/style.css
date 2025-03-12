@@ -1,0 +1,800 @@
+:root {
+    /* 现代化的亮色主题变量 */
+    --primary-color: #4f46e5;
+    --primary-hover: #4338ca;
+    --bg-color: #f9fafb;
+    --text-color: #1f2937;
+    --card-bg: #ffffff;
+    --card-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.025);
+    --header-bg: rgba(255, 255, 255, 0.9);
+    --footer-bg: #ffffff;
+    --hover-color: #f3f4f6;
+    --border-color: #e5e7eb;
+    --border-radius: 12px;
+    --transition-speed: 0.3s;
+    --transition-timing: ease;
+    --accent-color: #8b5cf6;
+    --success-color: #10b981;
+    --error-color: #ef4444;
+    --gradient-start: #4f46e5;
+    --gradient-end: #8b5cf6;
+    --disabled-bg: #e5e7eb;
+    --disabled-color: #9ca3af;
+}
+
+[data-theme="dark"] {
+    /* 现代化的暗色主题变量 */
+    --primary-color: #6366f1;
+    --primary-hover: #818cf8;
+    --bg-color: #0f172a;
+    --text-color: #f1f5f9;
+    --card-bg: #1e293b;
+    --card-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.2), 0 4px 6px -2px rgba(0, 0, 0, 0.1);
+    --header-bg: rgba(30, 41, 59, 0.9);
+    --footer-bg: #1e293b;
+    --hover-color: #334155;
+    --border-color: #334155;
+    --accent-color: #a78bfa;
+    --success-color: #34d399;
+    --error-color: #f87171;
+    --gradient-start: #6366f1;
+    --gradient-end: #a78bfa;
+    --disabled-bg: #334155;
+    --disabled-color: #64748b;
+}
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', sans-serif;
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    transition: background-color var(--transition-speed) var(--transition-timing), 
+                color var(--transition-speed) var(--transition-timing);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    line-height: 1.6;
+}
+
+/* 添加无过渡效果的类 */
+body.no-transition,
+body.no-transition * {
+    transition: none !important;
+}
+
+.container {
+    width: 100%;
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 24px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+/* 现代化的标题设计 */
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 24px;
+    background-color: var(--header-bg);
+    border-radius: var(--border-radius);
+    margin-bottom: 36px;
+    box-shadow: var(--card-shadow);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    position: sticky;
+    top: 16px;
+    z-index: 1000;
+}
+
+.site-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--text-color);
+    position: relative;
+    display: inline-block;
+}
+
+.site-title::after {
+    content: "";
+    position: absolute;
+    bottom: -4px;
+    left: 0;
+    width: 50%;
+    height: 3px;
+    background: linear-gradient(to right, var(--gradient-start), var(--gradient-end));
+    border-radius: 3px;
+}
+
+.settings {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+/* 修改按钮悬停效果，去掉位移动画，只保留颜色变化 */
+.icon-button {
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    color: var(--text-color);
+    font-size: 1.1rem;
+    cursor: pointer;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color var(--transition-speed) var(--transition-timing), 
+                box-shadow var(--transition-speed) var(--transition-timing);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+}
+
+.icon-button:hover {
+    background-color: var(--hover-color);
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+}
+
+.icon-button:active {
+    background-color: var(--border-color);
+}
+
+#theme-button .light-icon {
+    display: none;
+}
+
+#theme-button .dark-icon {
+    display: inline;
+}
+
+[data-theme="dark"] #theme-button .light-icon {
+    display: inline;
+}
+
+[data-theme="dark"] #theme-button .dark-icon {
+    display: none;
+}
+
+.theme-toggle {
+    position: relative;
+}
+
+/* 现代化的主题菜单 */
+.theme-menu {
+    position: absolute;
+    right: 0;
+    top: 50px;
+    background-color: var(--card-bg);
+    box-shadow: var(--card-shadow);
+    border-radius: var(--border-radius);
+    padding: 16px;
+    width: 200px;
+    display: none;
+    z-index: 100;
+    border: 1px solid var(--border-color);
+    animation: fadeIn 0.2s ease-out;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.theme-menu.active {
+    display: block;
+}
+
+.menu-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+    padding: 8px 0;
+}
+
+.menu-item:last-child {
+    margin-bottom: 0;
+}
+
+.menu-item span {
+    font-weight: 500;
+}
+
+/* 现代化的开关设计 */
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 52px;
+    height: 26px;
+}
+
+.switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #e5e7eb;
+    transition: .4s;
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 20px;
+    width: 20px;
+    left: 3px;
+    bottom: 3px;
+    background-color: white;
+    transition: .4s;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+input:checked + .slider {
+    background: linear-gradient(to right, var(--gradient-start), var(--gradient-end));
+}
+
+input:checked + .slider:before {
+    transform: translateX(26px);
+}
+
+.slider.round {
+    border-radius: 26px;
+}
+
+.slider.round:before {
+    border-radius: 50%;
+}
+
+.lang-indicator {
+    display: none;
+}
+
+main {
+    flex: 1;
+}
+
+/* 现代化的工具网格布局 */
+.tools-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 32px;
+}
+
+/* 现代化的工具卡片设计 */
+.tool-card {
+    background-color: var(--card-bg);
+    border-radius: var(--border-radius);
+    padding: 32px 24px;
+    text-align: center;
+    box-shadow: var(--card-shadow);
+    cursor: pointer;
+    transition: all var(--transition-speed) var(--transition-timing);
+    border: 1px solid var(--border-color);
+    position: relative;
+    overflow: hidden;
+}
+
+.tool-card::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(to right, var(--gradient-start), var(--gradient-end));
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform var(--transition-speed) var(--transition-timing);
+}
+
+.tool-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+.tool-card:hover::before {
+    transform: scaleX(1);
+}
+
+.tool-icon {
+    font-size: 3rem;
+    margin-bottom: 20px;
+    color: var(--primary-color);
+    transition: transform var(--transition-speed) var(--transition-timing);
+}
+
+.tool-card:hover .tool-icon {
+    transform: scale(1.1);
+}
+
+.tool-card h3 {
+    margin-bottom: 12px;
+    font-size: 1.25rem;
+    font-weight: 600;
+}
+
+.tool-card p {
+    color: var(--text-color);
+    opacity: 0.8;
+    font-size: 0.9rem;
+}
+
+/* 现代化的页脚设计 */
+footer {
+    margin-top: 48px;
+    text-align: center;
+    padding: 24px;
+    background-color: var(--footer-bg);
+    border-radius: var(--border-radius);
+    font-size: 0.9rem;
+    box-shadow: var(--card-shadow);
+}
+
+/* 工具页面特定样式 */
+.tool-content {
+    background-color: var(--card-bg);
+    padding: 36px;
+    border-radius: var(--border-radius);
+    box-shadow: var(--card-shadow);
+    border: 1px solid var(--border-color);
+}
+
+.back-button {
+    margin-bottom: 24px;
+    display: inline-block;
+}
+
+.back-button a {
+    display: flex;
+    align-items: center;
+    color: var(--primary-color);
+    text-decoration: none;
+    font-size: 1rem;
+    font-weight: 500;
+    transition: all var(--transition-speed);
+    padding: 8px 16px;
+    border-radius: 20px;
+    background-color: var(--card-bg);
+    border: 1px solid var(--border-color);
+    box-shadow: var(--card-shadow);
+}
+
+.back-button a:hover {
+    background-color: var(--primary-color);
+    color: white;
+    transform: translateX(-5px);
+}
+
+.back-button i {
+    margin-right: 8px;
+}
+
+/* 首页英雄区域样式 */
+.hero-section {
+    text-align: center;
+    margin-bottom: 48px;
+    padding: 20px;
+    position: relative;
+}
+
+.hero-title {
+    font-size: 2.2rem;
+    font-weight: 700;
+    margin-bottom: 16px;
+    background: linear-gradient(to right, var(--gradient-start), var(--gradient-end));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: fadeInUp 0.8s ease-out;
+}
+
+.hero-description {
+    font-size: 1.1rem;
+    max-width: 700px;
+    margin: 0 auto;
+    opacity: 0.8;
+    line-height: 1.7;
+    animation: fadeInUp 0.8s ease-out 0.2s both;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* 移除卡片悬停效果和覆盖层 */
+.card-overlay {
+    display: none; /* 隐藏整个覆盖层 */
+}
+
+/* 修改卡片操作按钮，使其直接显示在卡片上 */
+.card-action {
+    margin-top: 16px;
+    background: linear-gradient(to right, var(--gradient-start), var(--gradient-end));
+    color: white;
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-weight: 500;
+    font-size: 0.9rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: all var(--transition-speed);
+    display: inline-block;
+    opacity: 0;
+    transform: translateY(10px);
+}
+
+.tool-card:hover .card-action {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* 优化页脚 */
+.footer-content {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+}
+
+.footer-links {
+    display: flex;
+    gap: 24px;
+}
+
+.footer-links a {
+    color: var(--text-color);
+    text-decoration: none;
+    transition: all var(--transition-speed);
+    position: relative;
+    font-weight: 500;
+}
+
+.footer-links a:hover {
+    color: var(--primary-color);
+}
+
+.footer-links a::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: -4px;
+    width: 0;
+    height: 2px;
+    background: linear-gradient(to right, var(--gradient-start), var(--gradient-end));
+    transition: width var(--transition-speed);
+}
+
+.footer-links a:hover::after {
+    width: 100%;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+    .tools-grid {
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 24px;
+    }
+    
+    header {
+        padding: 14px 20px;
+    }
+    
+    .site-title {
+        font-size: 1.3rem;
+    }
+    
+    .tool-content {
+        padding: 24px;
+    }
+
+    .hero-title {
+        font-size: 1.8rem;
+    }
+
+    .hero-description {
+        font-size: 1rem;
+    }
+
+    .footer-content {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .footer-links {
+        justify-content: center;
+    }
+}
+
+@media (max-width: 480px) {
+    .container {
+        padding: 16px;
+    }
+    
+    .tools-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .settings {
+        gap: 8px;
+    }
+    
+    .icon-button {
+        width: 36px;
+        height: 36px;
+    }
+    
+    .tool-card {
+        padding: 24px 18px;
+    }
+}
+
+/* 自定义滚动条 */
+::-webkit-scrollbar {
+    width: 12px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--bg-color);
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--primary-color);
+    background: linear-gradient(var(--gradient-start), var(--gradient-end));
+    border-radius: 6px;
+    border: 3px solid var(--bg-color);
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--primary-hover);
+}
+
+/* 占位符样式优化 */
+.placeholder {
+    margin-top: 40px;
+    text-align: center;
+    padding: 40px;
+}
+
+.placeholder i {
+    font-size: 5rem;
+    color: var(--primary-color);
+    opacity: 0.7;
+    animation: pulse 2s infinite alternate;
+}
+
+@keyframes pulse {
+    from { transform: scale(1); opacity: 0.7; }
+    to { transform: scale(1.1); opacity: 0.9; }
+}
+
+.placeholder p {
+    margin-top: 20px;
+    font-size: 1.1rem;
+    font-weight: 500;
+}
+
+/* 添加网站副标题样式 */
+.logo-container {
+    display: flex;
+    flex-direction: column;
+}
+
+.site-subtitle {
+    font-size: 0.9rem;
+    opacity: 0.8;
+    margin-top: 4px;
+    font-weight: 400;
+}
+
+/* 工具页面特定样式 */
+.tool-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 24px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.tool-header .tool-icon {
+    font-size: 2.5rem;
+    background: linear-gradient(to right, var(--gradient-start), var(--gradient-end));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 0;
+}
+
+.tool-header h2 {
+    font-size: 1.8rem;
+    margin: 0;
+    font-weight: 600;
+}
+
+.tool-description {
+    font-size: 1.05rem;
+    line-height: 1.7;
+    color: var(--text-color);
+    opacity: 0.9;
+    margin-bottom: 36px;
+}
+
+/* 修改自动模式为开关样式 */
+.menu-item.auto-theme {
+    margin-top: 12px;
+}
+
+.theme-menu .menu-item .switch-small,
+.theme-menu .menu-item .slider-small {
+    display: none;
+}
+
+.theme-menu .menu-item .switch-small {
+    position: relative;
+    display: inline-block;
+    width: 46px;
+    height: 22px;
+}
+
+.theme-menu .menu-item .switch-small input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.theme-menu .menu-item .slider-small {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #e5e7eb;
+    transition: .4s;
+    border-radius: 22px;
+}
+
+.theme-menu .menu-item .slider-small:before {
+    position: absolute;
+    content: "";
+    height: 16px;
+    width: 16px;
+    left: 3px;
+    bottom: 3px;
+    background-color: white;
+    transition: .4s;
+    border-radius: 50%;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.theme-menu .menu-item input:checked + .slider-small {
+    background-color: var(--accent-color);
+}
+
+.theme-menu .menu-item input:checked + .slider-small:before {
+    transform: translateX(24px);
+}
+
+/* 为禁用状态的主题开关添加样式 */
+.switch.disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.switch.disabled .slider {
+    cursor: not-allowed;
+    background-color: var(--disabled-bg);
+}
+
+.switch.disabled .slider:before {
+    background-color: var(--disabled-color);
+    box-shadow: none;
+}
+
+/* 禁用开关的鼠标悬停效果 */
+.switch.disabled:hover {
+    opacity: 0.6;
+}
+
+/* 添加全局过渡禁用样式 */
+html.no-transition,
+html.no-transition *,
+body.no-transition,
+body.no-transition * {
+    transition: none !important;
+    animation: none !important;
+}
+
+/* 统一自动模式开关样式 */
+.theme-menu .menu-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+    padding: 8px 0;
+}
+
+.theme-menu .menu-item:last-child {
+    margin-bottom: 0;
+}
+
+.theme-menu .menu-item span {
+    font-weight: 500;
+}
+
+/* 统一所有开关样式 */
+.switch,
+.switch-auto {
+    position: relative;
+    display: inline-block;
+    width: 52px;
+    height: 26px;
+}
+
+.switch input,
+.switch-auto input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider,
+.slider-auto {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #e5e7eb;
+    transition: .4s;
+    border-radius: 26px;
+}
+
+.slider:before,
+.slider-auto:before {
+    position: absolute;
+    content: "";
+    height: 20px;
+    width: 20px;
+    left: 3px;
+    bottom: 3px;
+    background-color: white;
+    transition: .4s;
+    border-radius: 50%;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+input:checked + .slider,
+input:checked + .slider-auto {
+    background: linear-gradient(to right, var(--gradient-start), var(--gradient-end));
+}
+
+input:checked + .slider:before,
+input:checked + .slider-auto:before {
+    transform: translateX(26px);
+}

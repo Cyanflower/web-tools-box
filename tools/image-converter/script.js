@@ -312,14 +312,27 @@ document.addEventListener('DOMContentLoaded', function() {
                             // 直接使用文件修改时间命名
                             const timestamp = file.lastModified;
                             const date = new Date(timestamp);
-                            // 格式化为 YYYYMMDD_HHMMSS
+                            // 格式化为 YYYYMMDD_HHMM（只精确到分钟）
                             const formattedDate = date.getFullYear() +
                                 ('0' + (date.getMonth() + 1)).slice(-2) +
                                 ('0' + date.getDate()).slice(-2) + '_' +
                                 ('0' + date.getHours()).slice(-2) +
-                                ('0' + date.getMinutes()).slice(-2) +
-                                ('0' + date.getSeconds()).slice(-2);
-                            newFileName = `converted_${formattedDate}${fileExtension}`;
+                                ('0' + date.getMinutes()).slice(-2);
+                            
+                            // 检查是否已存在相同分钟内的文件
+                            const baseTimeFileName = `converted_${formattedDate}`;
+                            if (!fileNameCounter.has(baseTimeFileName)) {
+                                fileNameCounter.set(baseTimeFileName, 0);
+                            }
+                            const timeCount = fileNameCounter.get(baseTimeFileName);
+                            fileNameCounter.set(baseTimeFileName, timeCount + 1);
+                            
+                            // 同一分钟内的第一个文件不加计数器，之后的文件添加计数器
+                            if (timeCount === 0) {
+                                newFileName = `${baseTimeFileName}${fileExtension}`;
+                            } else {
+                                newFileName = `${baseTimeFileName}_${timeCount}${fileExtension}`;
+                            }
                             break;
                             
                         case 'duplicate-counter':

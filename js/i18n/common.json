@@ -6,13 +6,14 @@
     "heroDesc": "Providing convenient online tools for your daily work and life, making complex tasks simple.",
     "useNow": "Use Now",
     "footerDesc": "Boost your efficiency with convenient online tools",
-    "about": "About Us",
-    "contact": "Contact",
-    "feedback": "Feedback",
+    "about": "Documentation",
+    "license": "License",
     "backToHome": "Back to Home",
     "siteSubtitle": "Convenient and practical online tools",
     "404Title": "404 - Page Not Found",
-    "404Message": "Sorry, the page you are looking for does not exist. It might have been moved, deleted, or is temporarily unavailable."
+    "404Message": "Sorry, the page you are looking for does not exist. It might have been moved, deleted, or is temporarily unavailable.",
+    "loading": "Loading",
+    "loadError": "Failed to load content"
   },
   "zh": {
     "theme": "主题",
@@ -21,12 +22,13 @@
     "heroDesc": "为您的日常工作和生活提供便捷的在线工具，让复杂任务变得简单。",
     "useNow": "立即使用",
     "footerDesc": "使用便捷的在线工具提高效率",
-    "about": "关于我们",
-    "contact": "联系我们",
-    "feedback": "意见反馈",
+    "about": "说明",
+    "license": "许可",
     "backToHome": "返回首页",
     "siteSubtitle": "便捷实用的在线工具集",
     "404Title": "404 - 页面未找到",
-    "404Message": "抱歉，您要查找的页面不存在。页面可能已被移动、删除或暂时无法访问。"
+    "404Message": "抱歉，您要查找的页面不存在。页面可能已被移动、删除或暂时无法访问。",
+    "loading": "加载中",
+    "loadError": "内容加载失败"
   }
 } 

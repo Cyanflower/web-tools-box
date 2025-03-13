@@ -7,11 +7,11 @@
     "tool3": "PNG Cleaner",
     "tool3Desc": "Remove extra chunks from PNG files",
     "tool4": "Tool 4",
-    "tool4Desc": "Tool 4 WIP",
+    "tool4Desc": "Coming Soon",
     "tool5": "Tool 5",
-    "tool5Desc": "Tool 5 WIP",
+    "tool5Desc": "Coming Soon",
     "tool6": "Tool 6",
-    "tool6Desc": "Tool 6 WIP"
+    "tool6Desc": "Coming Soon"
   },
   "zh": {
     "tool1": "Markdown图片提取器",
@@ -21,10 +21,10 @@
     "tool3": "PNG清理工具",
     "tool3Desc": "清理PNG文件中的额外数据块",
     "tool4": "工具 4",
-    "tool4Desc": "工具 4 开发中",
+    "tool4Desc": "开发中",
     "tool5": "工具 5",
-    "tool5Desc": "工具 5 开发中",
+    "tool5Desc": "开发中",
     "tool6": "工具 6",
-    "tool6Desc": "工具 6 开发中"
+    "tool6Desc": "开发中"
   }
 } 

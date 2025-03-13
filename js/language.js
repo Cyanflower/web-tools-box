@@ -207,6 +207,9 @@ const LanguageManager = (function() {
         
         // 应用翻译
         applyTranslations(lang);
+        
+        // 触发语言切换事件
+        document.dispatchEvent(new CustomEvent('languageChanged', { detail: { language: lang } }));
     }
     
     /**
@@ -264,18 +267,29 @@ const LanguageManager = (function() {
     }
     
     /**
-     * 获取翻译文本
+     * 获取指定键的翻译文本
      * @param {string} key - 翻译键
-     * @param {Object} [params] - 可选的参数对象，用于模板插值
+     * @param {Object} params - 替换参数
      * @returns {string} - 翻译后的文本
      */
     function getText(key, params = {}) {
-        const text = translations[currentLanguage][key] || key;
+        if (!translations[currentLanguage]) {
+            console.warn(`Translations for language "${currentLanguage}" not found.`);
+            return key;
+        }
         
-        // 简单的模板插值支持
-        if (params && typeof params === 'object') {
-            return text.replace(/\{(\w+)\}/g, (match, paramName) => {
-                return params[paramName] !== undefined ? params[paramName] : match;
+        let text = translations[currentLanguage][key];
+        
+        if (!text) {
+            console.warn(`Translation for key "${key}" not found in language "${currentLanguage}".`);
+            // 尝试从英文翻译中获取
+            text = translations[LANG_EN] && translations[LANG_EN][key] ? translations[LANG_EN][key] : key;
+        }
+        
+        // 替换参数
+        if (text && params) {
+            Object.keys(params).forEach(param => {
+                text = text.replace(new RegExp(`{${param}}`, 'g'), params[param]);
             });
         }
         
@@ -283,11 +297,19 @@ const LanguageManager = (function() {
     }
     
     /**
-     * 获取当前语言代码
-     * @returns {string} - 当前语言代码 ('en' 或 'zh')
+     * 获取当前语言
+     * @returns {string} - 当前语言代码
      */
     function getCurrentLanguage() {
         return currentLanguage;
+    }
+    
+    /**
+     * 检查语言管理器是否已初始化
+     * @returns {boolean} - 如果已初始化返回true，否则返回false
+     */
+    function isInitialized() {
+        return initialized;
     }
     
     /**
@@ -341,7 +363,8 @@ const LanguageManager = (function() {
         init,
         setLanguage,
         getCurrentLanguage,
-        getText
+        getText,
+        isInitialized
     };
 })();
 

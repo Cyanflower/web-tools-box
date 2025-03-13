@@ -73,16 +73,28 @@ document.addEventListener('DOMContentLoaded', function() {
         // 禁止背景滚动
         document.body.style.overflow = 'hidden';
         
-        // 获取base href路径
-        let baseHref = '';
+        // 构建绝对路径
+        let basePath = '';
+        
+        // 获取base标签中的href值
         const baseTag = document.querySelector('base');
         if (baseTag && baseTag.getAttribute('href')) {
-            baseHref = baseTag.getAttribute('href');
-            // 确保baseHref以"/"结尾
-            if (!baseHref.endsWith('/')) {
-                baseHref += '/';
+            basePath = baseTag.getAttribute('href');
+            
+            // 确保路径格式正确
+            if (!basePath.startsWith('/')) {
+                basePath = '/' + basePath;
             }
+            if (!basePath.endsWith('/')) {
+                basePath += '/';
+            }
+            
+            // 移除多余的斜杠
+            basePath = basePath.replace(/\/+/g, '/');
         }
+        
+        // 获取原始URL，移除协议、主机和端口部分的路径
+        const origin = window.location.origin;
         
         // 获取当前语言
         const currentLang = LanguageManager.getCurrentLanguage();
@@ -95,8 +107,9 @@ document.addEventListener('DOMContentLoaded', function() {
             markdownFile = markdownBaseName + '.md';
         }
         
-        // 构建完整的URL路径
-        const fullPath = baseHref + markdownFile;
+        // 构建完整的URL绝对路径
+        const fullPath = origin + basePath + markdownFile;
+        console.log('Loading markdown from:', fullPath);
         
         // 获取markdown文件内容
         fetch(fullPath)
@@ -104,7 +117,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (!response.ok) {
                     // 如果找不到语言特定的文件，尝试使用默认文件
                     if (currentLang === 'en') {
-                        return fetch(baseHref + markdownBaseName + '.md')
+                        console.log('Fallback to default markdown file:', origin + basePath + markdownBaseName + '.md');
+                        return fetch(origin + basePath + markdownBaseName + '.md')
                             .then(fallbackResponse => {
                                 if (!fallbackResponse.ok) {
                                     throw new Error('网络响应异常');

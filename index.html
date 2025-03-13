@@ -5,67 +5,28 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Web Tools</title>
     <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/loading-animation.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- 预先应用主题，防止闪烁 -->
-    <script>
-        // 尽早应用主题以防止闪烁
-        (function() {
-            try {
-                // 简化版的cookie读取函数
-                function getCookie(name) {
-                    const cookieName = name + "=";
-                    const decodedCookie = decodeURIComponent(document.cookie);
-                    const cookieArray = decodedCookie.split(';');
-                    
-                    for (let i = 0; i < cookieArray.length; i++) {
-                        let cookie = cookieArray[i];
-                        while (cookie.charAt(0) === ' ') {
-                            cookie = cookie.substring(1);
-                        }
-                        if (cookie.indexOf(cookieName) === 0) {
-                            return cookie.substring(cookieName.length, cookie.length);
-                        }
-                    }
-                    return null;
-                }
-
-                // 添加无过渡效果的类
-                document.documentElement.classList.add('no-transition');
-                
-                const savedTheme = getCookie('web_tools_theme');
-                
-                if (savedTheme === 'dark') {
-                    // 直接应用暗色主题到html元素
-                    document.documentElement.style.colorScheme = 'dark';
-                    document.documentElement.setAttribute('data-theme', 'dark');
-                } else if (savedTheme === 'auto') {
-                    // 检查系统主题
-                    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-                    if (prefersDark) {
-                        document.documentElement.style.colorScheme = 'dark';
-                        document.documentElement.setAttribute('data-theme', 'dark');
-                    }
-                }
-                
-                // 页面加载后移除无过渡效果类
-                window.addEventListener('load', function() {
-                    setTimeout(function() {
-                        document.documentElement.classList.remove('no-transition');
-                    }, 100);
-                });
-            } catch (e) {
-                // 出错不处理，让常规流程接管
-                console.error('预先应用主题失败：', e);
-            }
-        })();
-    </script>
+    <!-- 预先应用主题和加载动画 -->
+    <script src="js/preload-theme.js"></script>
+    <script src="js/loading-animation.js"></script>
 </head>
 <body>
+    <!-- 页面加载动画 -->
+    <div id="page-loading-overlay" class="page-loading-overlay">
+        <div class="loading-spinner"></div>
+        <div class="loading-logo">Web Tools</div>
+        <div class="loading-message">正在加载资源...</div>
+        <div class="loading-progress">
+            <div class="loading-progress-bar"></div>
+        </div>
+    </div>
+    
     <div class="container">
         <header>
             <div class="logo-container">
                 <h1 class="site-title">Web Tools</h1>
-                <p class="site-subtitle">便捷实用的在线工具集</p>
+                <p class="site-subtitle" data-i18n="siteSubtitle">便捷实用的在线工具集</p>
             </div>
             <div class="settings">
                 <div class="theme-toggle">
@@ -104,7 +65,7 @@
             </div>
             
             <div class="tools-grid">
-                <div class="tool-card" onclick="window.location.href='tools/markdown-image-extractor.html'">
+                <div class="tool-card" onclick="window.location.href='tools/markdown-image-extractor/index.html'">
                     <div class="tool-icon"><i class="fas fa-image"></i></div>
                     <h3 data-i18n="tool1">Tool 1</h3>
                     <p data-i18n="tool1Desc">Tool 1 Description</p>
@@ -112,16 +73,16 @@
                         <span class="card-action" data-i18n="useNow">立即使用</span>
                     </div>
                 </div>
-                <div class="tool-card" onclick="window.location.href='tools/tool2.html'">
-                    <div class="tool-icon"><i class="fas fa-clock"></i></div>
+                <div class="tool-card" onclick="window.location.href='tools/image-converter/index.html'">
+                    <div class="tool-icon"><i class="fas fa-exchange-alt"></i></div>
                     <h3 data-i18n="tool2">Tool 2</h3>
                     <p data-i18n="tool2Desc">Tool 2 Description</p>
                     <div class="card-overlay">
                         <span class="card-action" data-i18n="useNow">立即使用</span>
                     </div>
                 </div>
-                <div class="tool-card" onclick="window.location.href='tools/tool3.html'">
-                    <div class="tool-icon"><i class="fas fa-image"></i></div>
+                <div class="tool-card" onclick="window.location.href='tools/png-cleaner/index.html'">
+                    <div class="tool-icon"><i class="fas fa-broom"></i></div>
                     <h3 data-i18n="tool3">Tool 3</h3>
                     <p data-i18n="tool3Desc">Tool 3 Description</p>
                     <div class="card-overlay">

@@ -1,0 +1,30 @@
+{
+  "en": {
+    "tool1": "Markdown Image Extractor",
+    "tool1Desc": "Extract base64 images from markdown files",
+    "tool2": "Image Converter",
+    "tool2Desc": "Convert between PNG and JPG format",
+    "tool3": "PNG Cleaner",
+    "tool3Desc": "Remove extra chunks from PNG files",
+    "tool4": "Tool 4",
+    "tool4Desc": "Tool 4 WIP",
+    "tool5": "Tool 5",
+    "tool5Desc": "Tool 5 WIP",
+    "tool6": "Tool 6",
+    "tool6Desc": "Tool 6 WIP"
+  },
+  "zh": {
+    "tool1": "Markdown图片提取器",
+    "tool1Desc": "提取Markdown文件中的Base64图片",
+    "tool2": "图片格式转换器",
+    "tool2Desc": "PNG与JPG格式互相转换",
+    "tool3": "PNG清理工具",
+    "tool3Desc": "清理PNG文件中的额外数据块",
+    "tool4": "工具 4",
+    "tool4Desc": "工具 4 开发中",
+    "tool5": "工具 5",
+    "tool5Desc": "工具 5 开发中",
+    "tool6": "工具 6",
+    "tool6Desc": "工具 6 开发中"
+  }
+} 

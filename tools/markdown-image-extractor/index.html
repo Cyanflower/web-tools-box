@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Markdown图片提取器 - Web Tools</title>
+    <link rel="stylesheet" href="../../css/style.css">
+    <link rel="stylesheet" href="../../css/loading-animation.css">
+    <link rel="stylesheet" href="./style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- 预先应用主题和加载动画 -->
+    <script src="../../js/preload-theme.js"></script>
+    <script src="../../js/loading-animation.js"></script>
+</head>
+<body>
+    <!-- 页面加载动画 -->
+    <div id="page-loading-overlay" class="page-loading-overlay">
+        <div class="loading-spinner"></div>
+        <div class="loading-logo">Web Tools</div>
+        <div class="loading-message">正在加载资源...</div>
+        <div class="loading-progress">
+            <div class="loading-progress-bar"></div>
+        </div>
+    </div>
+    
+    <div class="container">
+        <header>
+            <div class="logo-container">
+                <h1 class="site-title" data-i18n="mdImageExtractor">Markdown图片提取器</h1>
+                <p class="site-subtitle" data-i18n="mdImageExtractorDesc">提取Markdown文件中的Base64图片</p>
+            </div>
+            <div class="settings">
+                <div class="theme-toggle">
+                    <button id="theme-button" class="icon-button" aria-label="Theme Settings">
+                        <i class="fas fa-sun light-icon"></i>
+                        <i class="fas fa-moon dark-icon"></i>
+                    </button>
+                    <div class="theme-menu">
+                        <div class="menu-item">
+                            <span data-i18n="theme">Theme</span>
+                            <label class="switch">
+                                <input type="checkbox" id="theme-switch">
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                        <div class="menu-item auto-theme">
+                            <span class="switch-label" data-i18n="auto">Auto</span>
+                            <label class="switch">
+                                <input type="checkbox" id="auto-theme">
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                <button id="language-button" class="icon-button" aria-label="Language">
+                    <i class="fas fa-language"></i>
+                    <span class="lang-indicator">EN</span>
+                </button>
+            </div>
+        </header>
+        
+        <main>
+            <div class="back-button">
+                <a href="../../index.html">
+                    <i class="fas fa-arrow-left"></i>
+                    <span data-i18n="backToHome">返回首页</span>
+                </a>
+            </div>
+
+            <div class="tool-content">
+                <div class="tool-header">
+                    <div class="tool-icon"><i class="fas fa-image"></i></div>
+                    <h2 data-i18n="mdImageExtractor">Markdown图片提取器</h2>
+                </div>
+                <p class="tool-description" data-i18n="mdImageExtractorLongDesc">
+                    这个工具可以从Markdown文件中提取Base64编码的图片，将它们转换为JPG图片文件，并打包为ZIP压缩包供下载。
+                    非常适合处理包含内嵌图片的Markdown笔记或文档。
+                </p>
+                
+                <!-- 文件上传区域 -->
+                <div class="upload-area" id="uploadArea">
+                    <i class="fas fa-file-upload"></i>
+                    <h3 data-i18n="uploadMdFile">上传Markdown文件</h3>
+                    <p data-i18n="dragOrClick">拖放文件到这里或点击选择文件</p>
+                    <input type="file" id="fileInput" class="file-input" accept=".md, .markdown, .txt">
+                    <button class="upload-btn" id="uploadButton" data-i18n="selectFile">选择文件</button>
+                </div>
+                
+                <!-- 结果显示区域 -->
+                <div class="result-area" id="resultArea">
+                    <div class="result-heading">
+                        <h3 data-i18n="extractionResults">处理结果</h3>
+                    </div>
+                    
+                    <div class="result-stats">
+                        <div class="result-stat">
+                            <h4 data-i18n="totalImages">总图片数</h4>
+                            <p id="totalImages">0</p>
+                        </div>
+                        <div class="result-stat">
+                            <h4 data-i18n="extractedImages">已提取图片</h4>
+                            <p id="extractedImages">0</p>
+                        </div>
+                        <div class="result-stat">
+                            <h4 data-i18n="zipSize">压缩包大小</h4>
+                            <p id="zipSize">0 KB</p>
+                        </div>
+                    </div>
+                    
+                    <div class="log-area" id="logArea"></div>
+                    
+                    <div class="result-actions">
+                        <button id="downloadZipButton" class="download-btn">
+                            <i class="fas fa-download"></i>
+                            <span id="downloadBtnText" data-i18n="downloadZip">下载图片压缩包</span>
+                            <div id="downloadBtnDots" class="btn-loading-dots" style="display: none">
+                                <span></span>
+                                <span></span>
+                                <span></span>
+                            </div>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </main>
+        
+        <footer>
+            <div class="footer-content">
+                <p>&copy; 2023 Web Tools | <span data-i18n="footerDesc">使用便捷的在线工具提高效率</span></p>
+                <div class="footer-links">
+                    <a href="#" data-i18n="about">关于我们</a>
+                    <a href="#" data-i18n="contact">联系我们</a>
+                    <a href="#" data-i18n="feedback">意见反馈</a>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <!-- 引入JSZip库，用于创建和下载ZIP文件 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+    
+    <!-- 核心脚本 -->
+    <script src="../../js/cookies.js"></script>
+    <script src="../../js/theme.js"></script>
+    <script src="../../js/language.js"></script>
+    <script src="../../js/main.js"></script>
+    
+    <!-- 工具特定的脚本 -->
+    <script src="./script.js"></script>
+</body>
+</html> 

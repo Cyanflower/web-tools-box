@@ -32,5 +32,18 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
+    // 添加淡入动画类
+    document.querySelectorAll('header, .hero-section, .tools-grid, footer').forEach(el => {
+        el.classList.add('fade-in-target');
+    });
+    
+    // 标记脚本已加载
+    if (window.LoadingManager) {
+        window.LoadingManager.scriptsLoaded();
+    }
+    
+    // 触发自定义事件
+    document.dispatchEvent(new CustomEvent('scriptsLoaded'));
+    
     console.log('Web Tools application initialized');
 });

@@ -50,18 +50,45 @@ const LanguageManager = (function() {
      */
     async function loadTranslations() {
         try {
-            // 计算基础路径
-            const basePath = currentTool ? '../../' : './';
+            // 构建绝对路径
+            let basePath = '';
+            
+            // 获取base标签中的href值
+            const baseTag = document.querySelector('base');
+            if (baseTag && baseTag.getAttribute('href')) {
+                basePath = baseTag.getAttribute('href');
+                
+                // 确保路径格式正确
+                if (!basePath.startsWith('/')) {
+                    basePath = '/' + basePath;
+                }
+                if (!basePath.endsWith('/')) {
+                    basePath += '/';
+                }
+                
+                // 移除多余的斜杠
+                basePath = basePath.replace(/\/+/g, '/');
+            }
+            
+            // 获取原始URL，移除协议、主机和端口部分的路径
+            const origin = window.location.origin;
+            
+            // 构建完整的URL路径
+            const commonJsonPath = origin + basePath + 'js/i18n/common.json';
+            const toolsJsonPath = origin + basePath + 'js/i18n/tools.json';
+            
+            console.log('Loading common translations from:', commonJsonPath);
+            console.log('Loading tools translations from:', toolsJsonPath);
             
             // 加载通用翻译
-            const commonTranslations = await loadJSON(`${basePath}js/i18n/common.json`);
+            const commonTranslations = await loadJSON(commonJsonPath);
             
             // 合并通用翻译
             translations.en = { ...translations.en, ...commonTranslations.en };
             translations.zh = { ...translations.zh, ...commonTranslations.zh };
             
             // 加载工具列表翻译
-            const toolsTranslations = await loadJSON(`${basePath}js/i18n/tools.json`);
+            const toolsTranslations = await loadJSON(toolsJsonPath);
             
             // 合并工具列表翻译
             translations.en = { ...translations.en, ...toolsTranslations.en };
@@ -69,7 +96,10 @@ const LanguageManager = (function() {
             
             // 如果当前在工具页面，加载特定工具的翻译
             if (currentTool && currentPath) {
-                const toolTranslations = await loadJSON(`${basePath}js/i18n/tools/${currentPath}/translations.json`);
+                const toolJsonPath = origin + basePath + `tools/${currentPath}/translations.json`;
+                console.log('Loading tool-specific translations from:', toolJsonPath);
+                
+                const toolTranslations = await loadJSON(toolJsonPath);
                 
                 // 合并工具特定翻译
                 translations.en = { ...translations.en, ...toolTranslations.en };
@@ -164,8 +194,16 @@ const LanguageManager = (function() {
             lang = LANG_EN; // 默认为英文
         }
         
-        // 保存到 cookie
-        CookieManager.setCookie(LANG_COOKIE, lang);
+        // 保存到 cookie，如果CookieManager可用
+        if (typeof CookieManager !== 'undefined') {
+            try {
+                CookieManager.setCookie(LANG_COOKIE, lang);
+            } catch (error) {
+                console.error('Error saving language to cookie:', error);
+            }
+        } else {
+            console.warn('CookieManager not available. Language preference will not be saved.');
+        }
         
         // 应用翻译
         applyTranslations(lang);
@@ -183,21 +221,35 @@ const LanguageManager = (function() {
      * 根据设置或浏览器首选项应用语言
      */
     function applyLanguageFromSettings() {
-        // 从 cookie 获取保存的语言设置
-        const savedLang = CookieManager.getCookie(LANG_COOKIE);
+        // 确保CookieManager已定义
+        if (typeof CookieManager === 'undefined') {
+            console.error('CookieManager is not defined. Language settings cannot be applied.');
+            // 应用默认语言
+            applyTranslations(LANG_EN);
+            return;
+        }
         
-        if (savedLang && (savedLang === LANG_EN || savedLang === LANG_ZH)) {
-            applyTranslations(savedLang);
-        } else {
-            // 获取浏览器语言
-            const browserLang = navigator.language || navigator.userLanguage;
-            const isZhBrowser = browserLang.toLowerCase().startsWith('zh');
+        try {
+            // 从 cookie 获取保存的语言设置
+            const savedLang = CookieManager.getCookie(LANG_COOKIE);
             
-            // 应用相应的语言
-            applyTranslations(isZhBrowser ? LANG_ZH : LANG_EN);
-            
-            // 保存自动检测到的语言设置
-            CookieManager.setCookie(LANG_COOKIE, isZhBrowser ? LANG_ZH : LANG_EN);
+            if (savedLang && (savedLang === LANG_EN || savedLang === LANG_ZH)) {
+                applyTranslations(savedLang);
+            } else {
+                // 获取浏览器语言
+                const browserLang = navigator.language || navigator.userLanguage;
+                const isZhBrowser = browserLang.toLowerCase().startsWith('zh');
+                
+                // 应用相应的语言
+                applyTranslations(isZhBrowser ? LANG_ZH : LANG_EN);
+                
+                // 保存自动检测到的语言设置
+                CookieManager.setCookie(LANG_COOKIE, isZhBrowser ? LANG_ZH : LANG_EN);
+            }
+        } catch (error) {
+            console.error('Error applying language settings:', error);
+            // 应用默认语言
+            applyTranslations(LANG_EN);
         }
     }
     
@@ -245,16 +297,43 @@ const LanguageManager = (function() {
     async function init() {
         if (initialized) return;
         
-        // 加载所有翻译
-        await loadTranslations();
-        
-        // 设置事件监听器
-        setupEventListeners();
-        
-        // 应用语言设置
-        applyLanguageFromSettings();
-        
-        initialized = true;
+        try {
+            console.log('Initializing language manager...');
+            
+            // 加载所有翻译
+            await loadTranslations();
+            
+            // 设置事件监听器
+            setupEventListeners();
+            
+            // 应用语言设置
+            // 确保所有必要的组件都已加载
+            if (typeof CookieManager !== 'undefined') {
+                applyLanguageFromSettings();
+            } else {
+                // 如果CookieManager未加载，延迟应用语言设置
+                console.log('Waiting for CookieManager to load...');
+                // 使用默认语言
+                applyTranslations(LANG_EN);
+                
+                // 等待一段时间后再次尝试
+                setTimeout(() => {
+                    if (typeof CookieManager !== 'undefined') {
+                        console.log('CookieManager loaded, applying language settings...');
+                        applyLanguageFromSettings();
+                    } else {
+                        console.warn('CookieManager still not available. Using default language.');
+                    }
+                }, 500);
+            }
+            
+            initialized = true;
+            console.log('Language manager initialized successfully.');
+        } catch (error) {
+            console.error('Error initializing language manager:', error);
+            // 使用默认语言，确保页面至少能显示
+            applyTranslations(LANG_EN);
+        }
     }
     
     // 导出公共 API

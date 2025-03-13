@@ -10,7 +10,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const resultArea = document.getElementById('resultArea');
     const totalImagesEl = document.getElementById('totalImages');
     const extractedImagesEl = document.getElementById('extractedImages');
-    const totalSizeEl = document.getElementById('totalSize');
+    const totalSizeEl = document.getElementById('zipSize');
     const logArea = document.getElementById('logArea');
     const downloadZipButton = document.getElementById('downloadZipButton');
     const downloadBtnText = document.getElementById('downloadBtnText');
@@ -148,7 +148,7 @@ document.addEventListener('DOMContentLoaded', function() {
         // 生成zip并更新大小
         zip.generateAsync({type: 'blob'})
             .then(function(blob) {
-                zipSizeEl.textContent = formatSize(blob.size);
+                totalSizeEl.textContent = formatSize(blob.size);
             });
     }
     
@@ -214,4 +214,4 @@ document.addEventListener('DOMContentLoaded', function() {
         
         return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
     }
-}); 
+});

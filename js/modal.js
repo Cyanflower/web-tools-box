@@ -47,14 +47,14 @@ document.addEventListener('DOMContentLoaded', function() {
     if (aboutLink) {
         aboutLink.addEventListener('click', function(e) {
             e.preventDefault();
-            showMarkdownModal('readme', LanguageManager.getText('about'));
+            showMarkdownModal('README', LanguageManager.getText('about'));
         });
     }
     
     if (licenseLink) {
         licenseLink.addEventListener('click', function(e) {
             e.preventDefault();
-            showMarkdownModal('license', LanguageManager.getText('license'));
+            showMarkdownModal('LICENSE', LanguageManager.getText('license'));
         });
     }
     

@@ -10,7 +10,8 @@ Web Tools 是在 GNU 通用公共许可证 (GPL) 第3版下发布的开源软件
 
 本程序的发布是希望它能有所帮助，但是**不提供任何担保**；甚至不提供对**适销性**或**特定用途适用性**的暗示担保。更多详情，请参阅GNU通用公共许可证。
 
-完整版 GPL-V3 许可请访问 [https://www.gnu.org/licenses/](https://www.gnu.org/licenses/)。
+完整版 GPL-V3 许可请访问:
+[https://www.gnu.org/licenses/](https://www.gnu.org/licenses/)。
 
 ## 第三方库和资源
 

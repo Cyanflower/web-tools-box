@@ -13,8 +13,7 @@
     "404Title": "404 - Page Not Found",
     "404Message": "Sorry, the page you are looking for does not exist. It might have been moved, deleted, or is temporarily unavailable.",
     "loading": "Loading",
-    "loadError": "Failed to load content",
-    "comingSoon": "Coming Soon"
+    "loadError": "Failed to load content"
   },
   "zh": {
     "theme": "主题",
@@ -30,7 +29,6 @@
     "404Title": "404 - 页面未找到",
     "404Message": "抱歉，您要查找的页面不存在。页面可能已被移动、删除或暂时无法访问。",
     "loading": "加载中",
-    "loadError": "内容加载失败",
-    "comingSoon": "即将推出"
+    "loadError": "内容加载失败"
   }
-}
+} 

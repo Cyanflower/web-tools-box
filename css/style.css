@@ -1038,3 +1038,61 @@ input:checked + .slider-auto:before {
         padding: 20px;
     }
 }
+
+/* 禁用的工具卡片样式 */
+.tool-card-disabled {
+    opacity: 0.75;
+    cursor: not-allowed !important;
+    background-color: var(--disabled-bg) !important;
+    color: var(--disabled-color) !important;
+    border: 1px solid var(--border-color) !important;
+    position: relative; /* 确保相对定位保持不变 */
+}
+
+/* 允许卡片保留悬停动画效果 */
+.tool-card-disabled:hover {
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04) !important;
+    transform: translateY(-8px) !important;
+}
+
+.tool-card-disabled:hover::before {
+    transform: scaleX(1) !important;
+}
+
+.tool-card-disabled .tool-icon {
+    color: var(--disabled-color) !important;
+}
+
+.tool-card-disabled:hover .tool-icon {
+    transform: scale(1.1) !important;
+}
+
+.tool-card-disabled .card-overlay {
+    display: none !important;
+}
+
+/* 工具状态标签样式 */
+.tool-status-label {
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    background-color: var(--disabled-color) !important;
+    color: var(--card-bg) !important;
+    padding: 6px 12px !important;
+    border-radius: 6px !important;
+    font-size: 0.85rem !important;
+    font-weight: 600 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.5px !important;
+    margin: 8px auto !important;
+    min-height: 30px !important;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
+    animation: pulse 2s infinite alternate !important;
+    max-width: 160px !important;
+    z-index: 2 !important; /* 确保状态标签在最上层 */
+}
+
+@keyframes pulse {
+    from { opacity: 0.8; }
+    to { opacity: 1; transform: scale(1.05); }
+}

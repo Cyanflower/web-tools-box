@@ -46,7 +46,13 @@
     "chunkgAMA": "gAMA - Gamma information",
     "chunkcHRM": "cHRM - Chromaticity coordinates",
     "chunkiCCP": "iCCP - ICC color profile",
-    "processing": "Processing..."
+    "processing": "Processing...",
+    "fileAlreadyProcessed": "has already been processed, skipping",
+    "clearWorkspace": "Clear Workspace",
+    "filenameMode": "Output Filename Mode",
+    "filenameMode1": "Original filename with counter for duplicates (default)",
+    "filenameMode2": "Submission order sequence (1,2,3...)",
+    "filenameMode3": "Use file's modification timestamp (YYYYMMDD_HHMMSS)"
   },
   "zh": {
     "pngCleaner": "PNG清理工具",
@@ -95,6 +101,12 @@
     "chunkgAMA": "gAMA - 伽马信息",
     "chunkcHRM": "cHRM - 色度坐标",
     "chunkiCCP": "iCCP - ICC色彩配置文件",
-    "processing": "处理中..."
+    "processing": "处理中...",
+    "fileAlreadyProcessed": "已经处理过，跳过",
+    "clearWorkspace": "清空工作区",
+    "filenameMode": "输出文件命名方式",
+    "filenameMode1": "使用原文件名，重名时添加序号",
+    "filenameMode2": "使用提交顺序的数字序号",
+    "filenameMode3": "使用文件的修改时间戳（YYYYMMDD_HHMMSS）"
   }
 } 

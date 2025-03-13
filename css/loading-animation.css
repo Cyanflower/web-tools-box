@@ -50,6 +50,7 @@
     font-weight: 700;
     background: linear-gradient(to right, var(--gradient-start), var(--gradient-end));
     -webkit-background-clip: text;
+    background-clip: text;
     color: transparent;
     margin-bottom: 16px;
 }

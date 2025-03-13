@@ -95,8 +95,9 @@
 /* 模式选择器样式 */
 .mode-selector {
     display: flex;
-    gap: 16px;
-    margin-bottom: 24px;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 16px;
 }
 
 .mode-option {
@@ -120,6 +121,28 @@
 
 .mode-option input {
     display: none;
+}
+
+/* 文件命名配置 */
+.filename-mode-selector {
+    margin-bottom: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.filename-mode-select {
+    background-color: var(--input-bg);
+    border: 1px solid var(--border-color);
+    padding: 8px 12px;
+    border-radius: var(--border-radius);
+    color: var(--text-color);
+    font-size: 14px;
+}
+
+.filename-mode-select:focus {
+    border-color: var(--primary-color);
+    outline: none;
 }
 
 /* 数据块列表样式 */
@@ -161,6 +184,7 @@
 
 .chunk-option input[type="checkbox"] {
     -webkit-appearance: none;
+    appearance: none;
     width: 18px;
     height: 18px;
     border: 2px solid var(--border-color);
@@ -260,6 +284,11 @@
     color: var(--error-color);
 }
 
+.warning-msg {
+    background-color: rgba(245, 158, 11, 0.1);
+    color: #f59e0b;
+}
+
 .success-msg {
     background-color: rgba(16, 185, 129, 0.1);
     color: var(--success-color);
@@ -303,6 +332,31 @@
 }
 
 .download-btn i {
+    font-size: 1.1rem;
+}
+
+/* 清空工作区按钮样式 */
+.clear-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    border: 1px solid var(--border-color);
+    padding: 12px 24px;
+    border-radius: 30px;
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.clear-btn:hover {
+    background-color: var(--hover-color);
+}
+
+.clear-btn i {
     font-size: 1.1rem;
 }
 

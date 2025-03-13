@@ -73,15 +73,14 @@ document.addEventListener('DOMContentLoaded', function() {
         // 禁止背景滚动
         document.body.style.overflow = 'hidden';
         
-        // 获取当前页面相对于根目录的路径深度
-        const pathParts = window.location.pathname.split('/').filter(part => part.length > 0);
-        let basePath = '';
-        
-        // 如果在子目录中，需要返回到根目录
-        if (pathParts.length > 1) {
-            // 对于每一级子目录，添加一个"../"
-            for (let i = 1; i < pathParts.length; i++) {
-                basePath += '../';
+        // 获取base href路径
+        let baseHref = '';
+        const baseTag = document.querySelector('base');
+        if (baseTag && baseTag.getAttribute('href')) {
+            baseHref = baseTag.getAttribute('href');
+            // 确保baseHref以"/"结尾
+            if (!baseHref.endsWith('/')) {
+                baseHref += '/';
             }
         }
         
@@ -96,13 +95,16 @@ document.addEventListener('DOMContentLoaded', function() {
             markdownFile = markdownBaseName + '.md';
         }
         
-        // 获取markdown文件内容，添加基础路径前缀
-        fetch(basePath + markdownFile)
+        // 构建完整的URL路径
+        const fullPath = baseHref + markdownFile;
+        
+        // 获取markdown文件内容
+        fetch(fullPath)
             .then(response => {
                 if (!response.ok) {
                     // 如果找不到语言特定的文件，尝试使用默认文件
                     if (currentLang === 'en') {
-                        return fetch(basePath + markdownBaseName + '.md')
+                        return fetch(baseHref + markdownBaseName + '.md')
                             .then(fallbackResponse => {
                                 if (!fallbackResponse.ok) {
                                     throw new Error('网络响应异常');

@@ -3,13 +3,57 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <base id="baseHref">
     <title data-i18n="404Title">404 - 页面未找到 | Web Tools</title>
-    <link rel="stylesheet" href="css/style.css">
-    <link rel="stylesheet" href="css/loading-animation.css">
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/loading-animation.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- 预先应用主题和加载动画 -->
-    <script src="js/preload-theme.js"></script>
-    <script src="js/loading-animation.js"></script>
+    <script src="/js/preload-theme.js"></script>
+    <script src="/js/loading-animation.js"></script>
+    <!-- 路径修复脚本，放在CSS和JS加载前 -->
+    <script>
+        // 修复在GitHub Pages上404页面的路径问题
+        (function() {
+            // 获取当前网站的hostname，例如：username.github.io
+            var host = window.location.hostname;
+            // 获取pathname部分，例如：/repo-name/non-existent-page
+            var pathname = window.location.pathname;
+            
+            // 推断基本URL
+            var baseUrl = '/';
+            
+            // 对于GitHub Pages上的项目网站，URL格式通常是username.github.io/repo-name
+            // 如果URL包含子路径(repo-name)，我们需要调整baseUrl
+            if (host.includes('github.io')) {
+                var parts = pathname.split('/');
+                if (parts.length > 1 && parts[1] !== '') {
+                    // 第一段是repo-name
+                    baseUrl = '/' + parts[1] + '/';
+                }
+            }
+            
+            // 设置base标签的href
+            document.getElementById('baseHref').setAttribute('href', baseUrl);
+            
+            // 动态修复CSS和JS路径
+            var links = document.getElementsByTagName('link');
+            for (var i = 0; i < links.length; i++) {
+                var href = links[i].getAttribute('href');
+                if (href && href.startsWith('/') && !href.startsWith('//') && !href.startsWith('http')) {
+                    links[i].setAttribute('href', href.substring(1)); // 移除开头的斜杠
+                }
+            }
+            
+            var scripts = document.getElementsByTagName('script');
+            for (var i = 0; i < scripts.length; i++) {
+                var src = scripts[i].getAttribute('src');
+                if (src && src.startsWith('/') && !src.startsWith('//') && !src.startsWith('http')) {
+                    scripts[i].setAttribute('src', src.substring(1)); // 移除开头的斜杠
+                }
+            }
+        })();
+    </script>
     <style>
         .error-container {
             text-align: center;
@@ -121,7 +165,7 @@
                 <p class="error-message" data-i18n="404Message">
                     抱歉，您要查找的页面不存在。页面可能已被移动、删除或暂时无法访问。
                 </p>
-                <a href="index.html" class="home-button">
+                <a href="/" id="homeLink" class="home-button">
                     <i class="fas fa-home"></i>
                     <span data-i18n="backToHome">返回首页</span>
                 </a>
@@ -140,11 +184,31 @@
     </div>
 
     <!-- 核心脚本 -->
-    <script src="js/cookies.js"></script>
-    <script src="js/theme.js"></script>
-    <script src="js/language.js"></script>
-    <script src="js/main.js"></script>
+    <script src="/js/cookies.js"></script>
+    <script src="/js/theme.js"></script>
+    <script src="/js/language.js"></script>
+    <script src="/js/main.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-    <script src="js/modal.js"></script>
+    <script src="/js/modal.js"></script>
+    <script>
+        // 修复首页链接
+        document.addEventListener('DOMContentLoaded', function() {
+            // 获取基本URL
+            var baseHref = document.getElementById('baseHref').getAttribute('href') || '/';
+            
+            // 更新首页链接
+            document.getElementById('homeLink').setAttribute('href', baseHref);
+            
+            // 更新其他相对链接
+            var allLinks = document.querySelectorAll('a:not([href^="http"]):not([href^="#"]):not([href^="javascript"])');
+            allLinks.forEach(function(link) {
+                var href = link.getAttribute('href');
+                if (href && href.startsWith('/')) {
+                    // 移除开头的斜杠，与baseHref组合
+                    link.setAttribute('href', baseHref + href.substring(1));
+                }
+            });
+        });
+    </script>
 </body>
 </html> 

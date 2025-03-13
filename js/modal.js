@@ -73,15 +73,24 @@ document.addEventListener('DOMContentLoaded', function() {
         // 禁止背景滚动
         document.body.style.overflow = 'hidden';
         
-        // 获取当前页面相对于根目录的路径深度
-        const pathParts = window.location.pathname.split('/').filter(part => part.length > 0);
+        // 获取baseHref作为基础路径
         let basePath = '';
+        const baseElement = document.getElementById('baseHref');
         
-        // 如果在子目录中，需要返回到根目录
-        if (pathParts.length > 1) {
-            // 对于每一级子目录，添加一个"../"
-            for (let i = 1; i < pathParts.length; i++) {
-                basePath += '../';
+        if (baseElement && baseElement.getAttribute('href')) {
+            // 如果存在baseHref元素（通常在404页面上），使用它的值
+            basePath = baseElement.getAttribute('href');
+        } else {
+            // 否则，使用相对路径计算
+            // 获取当前页面相对于根目录的路径深度
+            const pathParts = window.location.pathname.split('/').filter(part => part.length > 0);
+            
+            // 如果在子目录中，需要返回到根目录
+            if (pathParts.length > 1) {
+                // 对于每一级子目录，添加一个"../"
+                for (let i = 1; i < pathParts.length; i++) {
+                    basePath += '../';
+                }
             }
         }
         

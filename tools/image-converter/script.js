@@ -16,6 +16,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const downloadBtnText = document.getElementById('downloadBtnText');
     const downloadBtnDots = document.getElementById('downloadBtnDots');
     const convertedImagesContainer = document.getElementById('convertedImages');
+    const clearWorkspaceButton = document.getElementById('clearWorkspaceButton');
     
     // 转换设置元素
     const modeOptions = document.querySelectorAll('.mode-option');
@@ -28,16 +29,28 @@ document.addEventListener('DOMContentLoaded', function() {
     const preserveMetadataPng = document.getElementById('preserve-metadata-png');
     const pngToJpgSettings = document.querySelector('.png-to-jpg-settings');
     const jpgToPngSettings = document.querySelector('.jpg-to-png-settings');
+    const commonSettings = document.querySelector('.common-settings');
+    const filenameSelect = document.getElementById('filename-mode');
     const resetSettingsButton = document.getElementById('reset-settings');
     
     // 全局变量
     let convertedImages = [];
     let zip = null;
     let currentMode = 'png-to-jpg'; // 默认转换模式
+    let filenameMode = 'duplicate-counter'; // 默认文件命名模式
+    let processedFileIdentifiers = new Set(); // 用于存储已处理的文件标识符（文件名+大小），防止重复上传
+    let fileNameCounter = new Map(); // 用于记录每个基本文件名的计数，处理同名不同大小的文件
+    let fileSequenceCounter = 1; // 用于数字序号命名
     
     // 初始化上传区域事件
     uploadButton.addEventListener('click', function() {
         fileInput.click();
+    });
+    
+    // 文件命名模式选择
+    filenameSelect.addEventListener('change', function() {
+        filenameMode = this.value;
+        addLogEntry(`${LanguageManager.getText('filenameMode')}: ${this.options[this.selectedIndex].textContent}`);
     });
     
     // 初始化转换模式选择
@@ -75,11 +88,17 @@ document.addEventListener('DOMContentLoaded', function() {
                 option.classList.remove('active');
             }
         });
+        
+        // 通用设置始终显示
+        commonSettings.style.display = 'block';
     }
     
     // 清空结果区域的函数
     function clearResults() {
         convertedImages = [];
+        processedFileIdentifiers.clear(); // 清空已处理文件标识符集合
+        fileNameCounter.clear(); // 清空文件名计数器
+        fileSequenceCounter = 1; // 重置序号计数器
         convertedImagesContainer.innerHTML = '';
         logArea.innerHTML = '';
         resultArea.style.display = 'none';
@@ -121,13 +140,19 @@ document.addEventListener('DOMContentLoaded', function() {
         // 重置保留元数据选项
         preserveMetadataJpg.checked = true;
         preserveMetadataPng.checked = true;
+        
+        // 重置数字序号命名选项
+        filenameMode = 'duplicate-counter';
+        filenameSelect.value = 'duplicate-counter';
     });
     
     // 文件选择事件
     fileInput.addEventListener('change', function(e) {
         if (e.target.files.length > 0) {
-            // 清空之前的结果
-            clearResults();
+            // 如果是新的上传（没有已处理的文件），才清空结果
+            if (convertedImages.length === 0) {
+                clearResults();
+            }
             processFiles(e.target.files);
         }
     });
@@ -147,8 +172,10 @@ document.addEventListener('DOMContentLoaded', function() {
         uploadArea.classList.remove('active');
         
         if (e.dataTransfer.files.length > 0) {
-            // 清空之前的结果
-            clearResults();
+            // 如果是新的上传（没有已处理的文件），才清空结果
+            if (convertedImages.length === 0) {
+                clearResults();
+            }
             processFiles(e.dataTransfer.files);
         }
     });
@@ -157,6 +184,14 @@ document.addEventListener('DOMContentLoaded', function() {
     downloadZipButton.addEventListener('click', function() {
         if (zip && convertedImages.length > 0) {
             downloadZip();
+        }
+    });
+    
+    // 清空工作区按钮事件
+    clearWorkspaceButton.addEventListener('click', function() {
+        if (convertedImages.length > 0) {
+            clearResults();
+            addLogEntry(LanguageManager.getText('clearWorkspace'), 'success-msg');
         }
     });
     
@@ -180,28 +215,44 @@ document.addEventListener('DOMContentLoaded', function() {
             addLogEntry(LanguageManager.getText('incompatibleMode'), 'error-msg');
         }
         
-        // 重置
+        // 初始化结果区域
         resultArea.style.display = 'block';
-        convertedImages = [];
-        convertedImagesContainer.innerHTML = '';
-        logArea.innerHTML = '';
-        zip = new JSZip();
+        if (!zip) {
+            zip = new JSZip();
+        }
         
-        totalFilesEl.textContent = validFiles.length;
-        convertedFilesEl.textContent = '0';
-        totalSizeEl.textContent = '0 KB';
+        // 过滤掉重复文件 - 使用文件名+大小作为唯一标识
+        const uniqueFiles = validFiles.filter(file => {
+            // 创建文件唯一标识：文件名 + 文件大小
+            const fileIdentifier = `${file.name}_${file.size}`;
+            
+            if (processedFileIdentifiers.has(fileIdentifier)) {
+                // 记录日志，提示用户该文件已处理过
+                addLogEntry(`${file.name} ${LanguageManager.getText('fileAlreadyProcessed')}`, 'warning-msg');
+                return false;
+            }
+            return true;
+        });
+        
+        // 更新统计数字（总文件数增加新的有效文件数量）
+        const currentTotalFiles = parseInt(totalFilesEl.textContent);
+        totalFilesEl.textContent = currentTotalFiles + uniqueFiles.length;
         
         // 获取当前设置
         const settings = {
             mode: currentMode,
             jpgQuality: parseInt(jpgQualitySlider.value) / 100,
             backgroundColor: backgroundColorPicker.value,
-            preserveMetadata: currentMode === 'png-to-jpg' ? preserveMetadataJpg.checked : preserveMetadataPng.checked
+            preserveMetadata: currentMode === 'png-to-jpg' ? preserveMetadataJpg.checked : preserveMetadataPng.checked,
+            filenameMode: filenameMode
         };
         
         // 逐个处理文件
-        validFiles.forEach((file, index) => {
-            convertImage(file, settings, index);
+        uniqueFiles.forEach((file, index) => {
+            // 将文件标识符添加到已处理集合中
+            const fileIdentifier = `${file.name}_${file.size}`;
+            processedFileIdentifiers.add(fileIdentifier);
+            convertImage(file, settings, convertedImages.length + index);
         });
     }
     
@@ -247,6 +298,60 @@ document.addEventListener('DOMContentLoaded', function() {
                         quality = 1; // PNG使用无损压缩
                     }
                     
+                    let newFileName;
+                    
+                    // 根据命名设置选择文件命名方式
+                    switch(settings.filenameMode) {
+                        case 'sequence-order':
+                            // 按提交顺序命名
+                            newFileName = `${fileSequenceCounter}${fileExtension}`;
+                            fileSequenceCounter++;
+                            break;
+                            
+                        case 'modification-time':
+                            // 直接使用文件修改时间命名
+                            const timestamp = file.lastModified;
+                            const date = new Date(timestamp);
+                            // 格式化为 YYYYMMDD_HHMM（只精确到分钟）
+                            const formattedDate = date.getFullYear() +
+                                ('0' + (date.getMonth() + 1)).slice(-2) +
+                                ('0' + date.getDate()).slice(-2) + '_' +
+                                ('0' + date.getHours()).slice(-2) +
+                                ('0' + date.getMinutes()).slice(-2);
+                            
+                            // 检查是否已存在相同分钟内的文件
+                            const baseTimeFileName = `converted_${formattedDate}`;
+                            if (!fileNameCounter.has(baseTimeFileName)) {
+                                fileNameCounter.set(baseTimeFileName, 0);
+                            }
+                            const timeCount = fileNameCounter.get(baseTimeFileName);
+                            fileNameCounter.set(baseTimeFileName, timeCount + 1);
+                            
+                            // 同一分钟内的第一个文件不加计数器，之后的文件添加计数器
+                            if (timeCount === 0) {
+                                newFileName = `${baseTimeFileName}${fileExtension}`;
+                            } else {
+                                newFileName = `${baseTimeFileName}_${timeCount}${fileExtension}`;
+                            }
+                            break;
+                            
+                        case 'duplicate-counter':
+                        default:
+                            // 使用原文件名 + 处理同名文件
+                            if (!fileNameCounter.has(fileName)) {
+                                fileNameCounter.set(fileName, 0);
+                            }
+                            const count = fileNameCounter.get(fileName);
+                            fileNameCounter.set(fileName, count + 1);
+                            
+                            if (count === 0) {
+                                newFileName = `${fileName}${fileExtension}`;
+                            } else {
+                                newFileName = `${fileName}_${count}${fileExtension}`;
+                            }
+                            break;
+                    }
+                    
                     // 转换为DataURL
                     const dataURL = canvas.toDataURL(mimeType, quality);
                     
@@ -259,13 +364,13 @@ document.addEventListener('DOMContentLoaded', function() {
                     const blob = new Blob([new Uint8Array(array)], {type: mimeType});
                     
                     // 添加到zip
-                    zip.file(`${fileName}${fileExtension}`, blob, {binary: true});
+                    zip.file(newFileName, blob, {binary: true});
                     
                     // 保存转换后的图片信息
                     convertedImages.push({
                         id: index + 1,
                         originalName: file.name,
-                        newName: `${fileName}${fileExtension}`,
+                        newName: newFileName,
                         size: blob.size,
                         preview: dataURL,
                         blob: blob
@@ -273,7 +378,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     
                     // 更新界面
                     updateConversionUI();
-                    addLogEntry(`${LanguageManager.getText('fileProcessed')}: ${fileName}${fileExtension}`, 'success-msg');
+                    addLogEntry(`${LanguageManager.getText('fileProcessed')}: ${newFileName}`, 'success-msg');
                     
                     // 创建图片预览
                     createImagePreview(convertedImages[convertedImages.length - 1]);
@@ -308,10 +413,9 @@ document.addEventListener('DOMContentLoaded', function() {
         // 所有文件处理完成
         if (convertedImages.length === parseInt(totalFilesEl.textContent)) {
             addLogEntry(LanguageManager.getText('allFilesProcessed'), 'success-msg');
-            
-            // 处理完成后重置文件输入，允许再次选择相同文件
-            fileInput.value = '';
         }
+        // 始终重置文件输入，允许再次选择相同文件
+        fileInput.value = '';
     }
     
     // 创建图片预览

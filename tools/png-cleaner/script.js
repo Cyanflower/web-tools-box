@@ -16,6 +16,8 @@ document.addEventListener('DOMContentLoaded', function() {
     const downloadBtnText = document.getElementById('downloadBtnText');
     const downloadBtnDots = document.getElementById('downloadBtnDots');
     const cleanedImagesContainer = document.getElementById('cleanedImages');
+    const clearWorkspaceButton = document.getElementById('clearWorkspaceButton');
+    const filenameSelect = document.getElementById('filename-mode');
     
     // 清理设置元素
     const modeOptions = document.querySelectorAll('.mode-option');
@@ -28,6 +30,10 @@ document.addEventListener('DOMContentLoaded', function() {
     let cleanedImages = [];
     let zip = null;
     let currentMode = 'essential-only'; // 默认清理模式
+    let filenameMode = 'duplicate-counter'; // 默认文件命名模式
+    let processedFileIdentifiers = new Set(); // 用于存储已处理的文件标识符（文件名+大小），防止重复上传
+    let fileNameCounter = new Map(); // 用于记录每个基本文件名的计数，处理同名不同大小的文件
+    let sequenceCounter = 1; // 用于按提交顺序命名的计数器
     
     // 初始化上传区域事件
     uploadButton.addEventListener('click', function() {
@@ -52,6 +58,9 @@ document.addEventListener('DOMContentLoaded', function() {
     // 清空结果区域的函数
     function clearResults() {
         cleanedImages = [];
+        processedFileIdentifiers.clear(); // 清空已处理文件标识符集合
+        fileNameCounter.clear(); // 清空文件名计数器
+        sequenceCounter = 1; // 重置顺序计数器
         cleanedImagesContainer.innerHTML = '';
         logArea.innerHTML = '';
         resultArea.style.display = 'none';
@@ -85,8 +94,10 @@ document.addEventListener('DOMContentLoaded', function() {
     // 文件选择事件
     fileInput.addEventListener('change', function(e) {
         if (e.target.files.length > 0) {
-            // 清空之前的结果
-            clearResults();
+            // 如果是新的上传（没有已处理的文件），才清空结果
+            if (cleanedImages.length === 0) {
+                clearResults();
+            }
             processFiles(e.target.files);
         }
     });
@@ -106,8 +117,10 @@ document.addEventListener('DOMContentLoaded', function() {
         uploadArea.classList.remove('active');
         
         if (e.dataTransfer.files.length > 0) {
-            // 清空之前的结果
-            clearResults();
+            // 如果是新的上传（没有已处理的文件），才清空结果
+            if (cleanedImages.length === 0) {
+                clearResults();
+            }
             processFiles(e.dataTransfer.files);
         }
     });
@@ -117,6 +130,18 @@ document.addEventListener('DOMContentLoaded', function() {
         if (zip && cleanedImages.length > 0) {
             downloadZip();
         }
+    });
+    
+    // 清空工作区按钮事件
+    clearWorkspaceButton.addEventListener('click', function() {
+        clearResults();
+        addLogEntry(LanguageManager.getText('workspaceCleared'), 'info-msg');
+    });
+    
+    // 文件命名模式选择
+    filenameSelect.addEventListener('change', function() {
+        filenameMode = this.value;
+        addLogEntry(`${LanguageManager.getText('filenameMode')}: ${this.options[this.selectedIndex].textContent}`);
     });
     
     // 处理上传的文件
@@ -135,23 +160,38 @@ document.addEventListener('DOMContentLoaded', function() {
             addLogEntry(LanguageManager.getText('invalidFileType'), 'error-msg');
         }
         
-        // 重置
+        // 初始化结果区域
         resultArea.style.display = 'block';
-        cleanedImages = [];
-        cleanedImagesContainer.innerHTML = '';
-        logArea.innerHTML = '';
-        zip = new JSZip();
+        if (!zip) {
+            zip = new JSZip();
+        }
         
-        totalFilesEl.textContent = validFiles.length;
-        cleanedFilesEl.textContent = '0';
-        sizeSavedEl.textContent = '0 KB';
+        // 过滤掉重复文件 - 使用文件名+大小作为唯一标识
+        const uniqueFiles = validFiles.filter(file => {
+            // 创建文件唯一标识：文件名 + 文件大小
+            const fileIdentifier = `${file.name}_${file.size}`;
+            
+            if (processedFileIdentifiers.has(fileIdentifier)) {
+                // 记录日志，提示用户该文件已处理过
+                addLogEntry(`${file.name} ${LanguageManager.getText('fileAlreadyProcessed')}`, 'warning-msg');
+                return false;
+            }
+            return true;
+        });
+        
+        // 更新统计数字（总文件数增加新的有效文件数量）
+        const currentTotalFiles = parseInt(totalFilesEl.textContent);
+        totalFilesEl.textContent = currentTotalFiles + uniqueFiles.length;
         
         // 获取要移除的chunk类型
         const chunksToRemove = getChunksToRemove();
         
         // 逐个处理文件
-        validFiles.forEach((file, index) => {
-            cleanPNG(file, chunksToRemove, index);
+        uniqueFiles.forEach((file, index) => {
+            // 将文件标识符添加到已处理集合中
+            const fileIdentifier = `${file.name}_${file.size}`;
+            processedFileIdentifiers.add(fileIdentifier);
+            cleanPNG(file, chunksToRemove, cleanedImages.length + index);
         });
     }
     
@@ -194,9 +234,62 @@ document.addEventListener('DOMContentLoaded', function() {
                 const sizeReduction = originalSize - newSize;
                 const reductionPercentage = ((sizeReduction / originalSize) * 100).toFixed(2);
                 
-                // 创建文件名
+                // 处理文件名 - 根据选择的命名模式
                 const fileName = file.name.substring(0, file.name.lastIndexOf('.'));
-                const newFileName = `${fileName}_cleaned.png`;
+                let newFileName;
+
+                // 根据当前的文件命名模式生成文件名
+                switch(filenameMode) {
+                    case 'sequence-order':
+                        // 按提交顺序命名
+                        newFileName = `cleaned_${sequenceCounter++}.png`;
+                        break;
+                        
+                    case 'modification-time':
+                        // 直接使用文件修改时间命名
+                        const timestamp = file.lastModified;
+                        const date = new Date(timestamp);
+                        // 格式化为 YYYYMMDD_HHMM（只精确到分钟）
+                        const formattedDate = date.getFullYear() +
+                            ('0' + (date.getMonth() + 1)).slice(-2) +
+                            ('0' + date.getDate()).slice(-2) + '_' +
+                            ('0' + date.getHours()).slice(-2) +
+                            ('0' + date.getMinutes()).slice(-2);
+                            
+                        // 检查是否已存在相同分钟内的文件
+                        const baseTimeFileName = `cleaned_${formattedDate}`;
+                        if (!fileNameCounter.has(baseTimeFileName)) {
+                            fileNameCounter.set(baseTimeFileName, 0);
+                        }
+                        const timeCount = fileNameCounter.get(baseTimeFileName);
+                        fileNameCounter.set(baseTimeFileName, timeCount + 1);
+                        
+                        // 同一分钟内的第一个文件不加计数器，之后的文件添加计数器
+                        if (timeCount === 0) {
+                            newFileName = `${baseTimeFileName}.png`;
+                        } else {
+                            newFileName = `${baseTimeFileName}_${timeCount}.png`;
+                        }
+                        break;
+                        
+                    case 'duplicate-counter':
+                    default:
+                        // 默认模式：使用原文件名，重名时添加序号
+                        // 使用Map跟踪每个基本文件名的使用次数
+                        if (!fileNameCounter.has(fileName)) {
+                            fileNameCounter.set(fileName, 0);
+                        }
+                        const count = fileNameCounter.get(fileName);
+                        fileNameCounter.set(fileName, count + 1);
+                        
+                        // 如果是同名文件的第二个及以后的实例，添加序号
+                        if (count === 0) {
+                            newFileName = `${fileName}_cleaned.png`;
+                        } else {
+                            newFileName = `${fileName}_cleaned_${count}.png`;
+                        }
+                        break;
+                }
                 
                 // 添加到zip
                 zip.file(newFileName, blob, { binary: true });
@@ -251,10 +344,9 @@ document.addEventListener('DOMContentLoaded', function() {
         // 所有文件处理完成
         if (cleanedImages.length === parseInt(totalFilesEl.textContent)) {
             addLogEntry(LanguageManager.getText('allFilesProcessed'), 'success-msg');
-            
-            // 处理完成后重置文件输入，允许再次选择相同文件
-            fileInput.value = '';
         }
+        // 始终重置文件输入，允许再次选择相同文件
+        fileInput.value = '';
     }
     
     // 创建图片预览

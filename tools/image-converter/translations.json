@@ -31,7 +31,14 @@
     "noFilesSelected": "No files selected",
     "incompatibleMode": "Some files are incompatible with current mode",
     "waitForCompletion": "Please wait for current conversion to complete",
-    "processing": "Processing..."
+    "processing": "Processing...",
+    "fileAlreadyProcessed": "has already been processed, skipping",
+    "clearWorkspace": "Clear Workspace",
+    "commonSettings": "Common Settings",
+    "filenameMode": "Output Filename Mode",
+    "filenameMode1": "Original filename with counter for duplicates (default)",
+    "filenameMode2": "Submission order sequence (1,2,3...)",
+    "filenameMode3": "Use file's modification timestamp (YYYYMMDD_HHMM)"
   },
   "zh": {
     "imageConverter": "图片格式转换器",
@@ -65,6 +72,13 @@
     "noFilesSelected": "未选择任何文件",
     "incompatibleMode": "部分文件与当前模式不兼容",
     "waitForCompletion": "请等待当前转换完成",
-    "processing": "处理中..."
+    "processing": "处理中...",
+    "fileAlreadyProcessed": "已经处理过，跳过",
+    "clearWorkspace": "清空工作区",
+    "commonSettings": "通用设置",
+    "filenameMode": "输出文件命名方式",
+    "filenameMode1": "使用原文件名，重名时添加序号",
+    "filenameMode2": "使用提交顺序的数字序号",
+    "filenameMode3": "使用文件的修改时间戳（YYYYMMDD_HHMM）"
   }
 } 

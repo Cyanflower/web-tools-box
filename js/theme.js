@@ -2,6 +2,57 @@
  * 主题管理器
  * 处理亮色/暗色主题切换、自动主题检测和用户偏好保存
  */
+
+// 立即执行函数：预加载主题，防止页面加载时闪烁
+(function() {
+    try {
+        // 简化版的缓存读取函数（防止CacheManager尚未加载）
+        function getThemeSettings() {
+            try {
+                const cacheKey = 'THEME_SETTINGS';
+                const cache = localStorage.getItem(cacheKey);
+                if (!cache) return null;
+                
+                const { version, data } = JSON.parse(cache);
+                return data;
+            } catch (error) {
+                console.error('预加载阶段读取主题设置失败:', error);
+                return null;
+            }
+        }
+
+        // 添加无过渡效果的类
+        document.documentElement.classList.add('no-transition');
+        
+        const settings = getThemeSettings();
+        
+        if (settings) {
+            if (settings.theme === 'dark') {
+                // 直接应用暗色主题到html元素
+                document.documentElement.style.colorScheme = 'dark';
+                document.documentElement.setAttribute('data-theme', 'dark');
+            } else if (settings.theme === 'auto') {
+                // 检查系统主题
+                const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+                if (prefersDark) {
+                    document.documentElement.style.colorScheme = 'dark';
+                    document.documentElement.setAttribute('data-theme', 'dark');
+                }
+            }
+        }
+        
+        // 页面加载后移除无过渡效果类
+        window.addEventListener('load', function() {
+            setTimeout(function() {
+                document.documentElement.classList.remove('no-transition');
+            }, 100);
+        });
+    } catch (e) {
+        // 出错不处理，让常规流程接管
+        console.error('预先应用主题失败：', e);
+    }
+})();
+
 const ThemeManager = {
     // 主题类型常量
     THEME_LIGHT: 'light',
@@ -217,33 +268,3 @@ const ThemeManager = {
 document.addEventListener('DOMContentLoaded', function() {
     ThemeManager.init();
 });
-
-// 提供一个函数用于提前应用主题，防止页面切换时闪烁
-function applyThemeEarly() {
-    try {
-        // 从缓存获取主题设置
-        const settings = CacheManager.getCache('THEME_SETTINGS');
-        
-        if (settings) {
-            if (settings.theme === 'dark') {
-                // 直接应用暗色主题到html元素
-                document.documentElement.style.colorScheme = 'dark';
-                document.documentElement.setAttribute('data-theme', 'dark');
-            } else if (settings.theme === 'auto') {
-                // 检查系统主题
-                const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-                if (prefersDark) {
-                    document.documentElement.style.colorScheme = 'dark';
-                    document.documentElement.setAttribute('data-theme', 'dark');
-                }
-            }
-        }
-        // 对于亮色主题或无主题设置，使用默认值（不需要特殊处理）
-    } catch (e) {
-        // 出错时不做任何处理，让常规初始化流程接管
-        console.error('提前应用主题时出错：', e);
-    }
-}
-
-// 导出提前应用主题函数
-window.applyThemeEarly = applyThemeEarly;

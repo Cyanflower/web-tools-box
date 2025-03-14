@@ -8,32 +8,10 @@
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/loading-animation.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- 预先应用缓存管理，用于检查加载状态 -->
-    <script src="js/cache-manager.js"></script>
-    <!-- 预检查是否需要显示加载动画 -->
-    <script>
-        // 检查是否需要显示加载动画
-        (function() {
-            // 获取存储的标记
-            const hasShown = !!CacheManager.getCache('LOADING_ANIMATION_SHOWN');
-            
-            // 如果已经显示过，隐藏加载动画元素
-            if (hasShown) {
-                document.addEventListener('DOMContentLoaded', function() {
-                    const overlay = document.getElementById('page-loading-overlay');
-                    if (overlay) {
-                        overlay.style.display = 'none';
-                    }
-                    document.body.classList.remove('loading-active');
-                    document.body.classList.add('loading-complete');
-                });
-            }
-        })();
-    </script>
     <!-- 预先应用主题和加载动画 -->
-    <script src="js/preload-theme.js"></script>
+    <script src="js/cache-manager.js"></script>
+    <script src="js/theme.js"></script>
     <script src="js/loading-animation.js"></script>
-    <script src="js/tool-availability.js"></script>
 </head>
 <body>
     <!-- 页面加载动画 -->
@@ -152,7 +130,6 @@
         </footer>
     </div>
 
-    <script src="js/theme.js"></script>
     <script src="js/language.js"></script>
     <script src="js/main.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>

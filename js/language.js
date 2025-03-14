@@ -228,6 +228,15 @@ const LanguageManager = (function() {
     }
     
     /**
+     * 获取浏览器语言设置
+     * @returns {string} 'zh' 或 'en'
+     */
+    function getBrowserLanguage() {
+        const browserLang = navigator.language || navigator.userLanguage;
+        return browserLang.toLowerCase().startsWith('zh') ? LANG_ZH : LANG_EN;
+    }
+    
+    /**
      * 根据设置或浏览器首选项应用语言
      */
     function applyLanguageFromSettings() {
@@ -238,12 +247,8 @@ const LanguageManager = (function() {
             if (savedLang && (savedLang === LANG_EN || savedLang === LANG_ZH)) {
                 applyTranslations(savedLang);
             } else {
-                // 获取浏览器语言
-                const browserLang = navigator.language || navigator.userLanguage;
-                const isZhBrowser = browserLang.toLowerCase().startsWith('zh');
-                
-                // 应用相应的语言
-                const detectedLang = isZhBrowser ? LANG_ZH : LANG_EN;
+                // 获取浏览器语言并应用
+                const detectedLang = getBrowserLanguage();
                 applyTranslations(detectedLang);
                 
                 // 保存自动检测到的语言设置
@@ -329,6 +334,7 @@ const LanguageManager = (function() {
         init,
         getText,
         getCurrentLanguage,
-        isInitialized
+        isInitialized,
+        getBrowserLanguage
     };
 })();

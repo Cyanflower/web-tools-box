@@ -39,8 +39,8 @@ document.addEventListener('DOMContentLoaded', function() {
             e.preventDefault();
             
             if (confirm(LanguageManager.getText('confirmClearCache') || '确定要清除所有缓存吗？这将重置所有设置。')) {
-                // 清除所有缓存
-                CacheManager.clearAllCache();
+                // 清除所有缓存（包括会话缓存）
+                CacheManager.clearAllCache(true);
                 
                 // 显示成功消息
                 alert(LanguageManager.getText('cacheCleared') || '缓存已清除，页面将刷新。');

@@ -24,6 +24,27 @@ const LoadingManager = (function() {
         STYLES: false
     };
     
+    // 缓存键名
+    const CACHE_TYPE = 'LOADING_ANIMATION_SHOWN';
+    
+    /**
+     * 检查是否应该显示加载动画
+     * 只有在用户首次访问网站时显示
+     * @returns {boolean} 是否应该显示
+     */
+    function shouldShowLoadingAnimation() {
+        // 判断是否已经显示过加载动画
+        const hasShown = !!CacheManager.getCache(CACHE_TYPE);
+        
+        // 如果没有显示过，则标记为已显示并返回true
+        if (!hasShown) {
+            CacheManager.setCache(CACHE_TYPE, true);
+            return true;
+        }
+        
+        return false;
+    }
+    
     /**
      * 找到加载遮罩层并保存引用
      */
@@ -114,6 +135,24 @@ const LoadingManager = (function() {
     }
     
     /**
+     * 立即隐藏加载动画（无动画）
+     */
+    function immediateHideLoadingOverlay() {
+        if (loadingOverlay) {
+            loadingOverlay.remove();
+            document.body.classList.remove('loading-active');
+            document.body.classList.add('loading-complete');
+            
+            // 添加内容淡入类，但不需要动画
+            const fadeElements = document.querySelectorAll('.fade-in-target');
+            fadeElements.forEach(el => {
+                el.style.opacity = 1;
+                el.style.transform = 'translateY(0)';
+            });
+        }
+    }
+    
+    /**
      * 标记资源为已加载
      * @param {string} resource - 资源类型
      */
@@ -128,6 +167,14 @@ const LoadingManager = (function() {
      * 初始化加载动画
      */
     function init() {
+        // 检查是否应该显示加载动画
+        if (!shouldShowLoadingAnimation()) {
+            // 如果不需要显示，立即隐藏加载遮罩
+            findLoadingElements();
+            immediateHideLoadingOverlay();
+            return;
+        }
+        
         // 查找已存在的加载动画元素
         findLoadingElements();
         
@@ -178,12 +225,21 @@ const LoadingManager = (function() {
         setResourceLoaded('SCRIPTS');
     }
     
+    /**
+     * 清除加载动画显示状态
+     * 用于测试或重置用户体验
+     */
+    function clearSessionFlag() {
+        CacheManager.clearCache(CACHE_TYPE);
+    }
+    
     // 当DOM加载完成后初始化
     document.addEventListener('DOMContentLoaded', init);
     
     // 返回公共API
     return {
         translationsLoaded,
-        scriptsLoaded
+        scriptsLoaded,
+        clearSessionFlag
     };
 })(); 

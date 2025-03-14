@@ -1,0 +1,23 @@
+# Sample .syncignore file
+# Lines starting with # are comments and will be ignored
+
+# Node.js specific files
+node_modules/
+package-lock.json
+
+# Development files
+.git/
+.gitignore
+.vscode/
+.cursor/
+.editorconfig
+*.log
+
+# Temporary files
+*.tmp
+.DS_Store
+Thumbs.db
+
+# This script itself (optional)
+sync.js
+.syncignore

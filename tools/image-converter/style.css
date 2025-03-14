@@ -193,9 +193,29 @@
     border-radius: 20px;
 }
 
-.color-value {
-    font-family: monospace;
-    font-size: 0.9rem;
+.color-value-input {
+    font-family: Consolas, Menlo, Monaco, 'DejaVu Sans Mono', 'Courier New', monospace;
+    font-size: 1.1rem;
+    background-color: var(--input-bg);
+    color: var(--text-color);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    padding: 8px 10px;
+    width: 90px;
+    text-align: center;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+}
+
+.color-value-input:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 2px rgba(var(--primary-color-rgb), 0.1);
+}
+
+.color-value-input.invalid {
+    border-color: var(--error-color);
+    color: var(--error-color);
 }
 
 /* 复选框样式 */
@@ -548,9 +568,54 @@
     border-radius: var(--border-radius);
     color: var(--text-color);
     font-size: 14px;
+    cursor: pointer;
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    background-size: 16px;
+    padding-right: 36px;
+    transition: all 0.3s ease;
 }
 
 .filename-mode-select:focus {
     border-color: var(--primary-color);
     outline: none;
+    box-shadow: 0 0 0 2px rgba(var(--primary-color-rgb), 0.2);
+}
+
+/* 修复下拉菜单在暗色模式下的样式 */
+.filename-mode-select option {
+    background-color: var(--card-bg);
+    color: var(--text-color);
+    padding: 10px;
+}
+
+/* Firefox特定样式 */
+@-moz-document url-prefix() {
+    .filename-mode-select {
+        color: var(--text-color);
+        background-color: var(--input-bg);
+    }
+    
+    .filename-mode-select option {
+        background-color: var(--card-bg);
+        color: var(--text-color);
+    }
+}
+
+/* 为Webkit浏览器(Chrome, Safari等)添加自定义下拉菜单样式 */
+.filename-mode-select::-webkit-scrollbar {
+    width: 8px;
+}
+
+.filename-mode-select::-webkit-scrollbar-track {
+    background: var(--bg-color);
+}
+
+.filename-mode-select::-webkit-scrollbar-thumb {
+    background-color: var(--border-color);
+    border-radius: 4px;
 }

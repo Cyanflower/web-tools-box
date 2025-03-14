@@ -24,7 +24,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const jpgQualitySlider = document.getElementById('jpg-quality');
     const jpgQualityValue = document.querySelector('.quality-value');
     const backgroundColorPicker = document.getElementById('background-color');
-    const backgroundColorValue = document.querySelector('.color-value');
+    const colorValueInput = document.getElementById('color-value-input');
     const preserveMetadataJpg = document.getElementById('preserve-metadata-jpg');
     const preserveMetadataPng = document.getElementById('preserve-metadata-png');
     const pngToJpgSettings = document.querySelector('.png-to-jpg-settings');
@@ -122,9 +122,50 @@ document.addEventListener('DOMContentLoaded', function() {
         jpgQualityValue.textContent = this.value;
     });
     
-    // 背景颜色选择器更新
+    // 颜色选择器和十六进制输入框的双向绑定
+    
+    // 颜色选择器更新时更新输入框
     backgroundColorPicker.addEventListener('input', function() {
-        backgroundColorValue.textContent = this.value;
+        colorValueInput.value = this.value;
+        colorValueInput.classList.remove('invalid');
+    });
+    
+    // 十六进制输入框更新时更新颜色选择器
+    colorValueInput.addEventListener('input', function() {
+        const hexColorRegex = /^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/;
+        const value = this.value;
+        
+        // 添加 # 前缀（如果用户没有输入）
+        if (value.length > 0 && value[0] !== '#') {
+            this.value = '#' + value;
+        }
+        
+        // 验证十六进制颜色格式
+        if (this.value.match(hexColorRegex)) {
+            backgroundColorPicker.value = this.value;
+            this.classList.remove('invalid');
+        } else {
+            this.classList.add('invalid');
+        }
+    });
+    
+    // 十六进制输入框失焦时进行格式矫正
+    colorValueInput.addEventListener('blur', function() {
+        const hexColorRegex = /^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/;
+        
+        // 如果格式不正确，回退到颜色选择器的值
+        if (!this.value.match(hexColorRegex)) {
+            this.value = backgroundColorPicker.value;
+            this.classList.remove('invalid');
+        } 
+        // 将3位十六进制转换为6位（如 #abc 转为 #aabbcc）
+        else if (this.value.length === 4) {
+            const r = this.value[1];
+            const g = this.value[2];
+            const b = this.value[3];
+            this.value = `#${r}${r}${g}${g}${b}${b}`;
+            backgroundColorPicker.value = this.value;
+        }
     });
     
     // 重置设置按钮
@@ -135,7 +176,8 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // 重置背景颜色
         backgroundColorPicker.value = '#ffffff';
-        backgroundColorValue.textContent = '#ffffff';
+        colorValueInput.value = '#ffffff';
+        colorValueInput.classList.remove('invalid');
         
         // 重置保留元数据选项
         preserveMetadataJpg.checked = true;

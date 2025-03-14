@@ -9,8 +9,9 @@
     <link rel="stylesheet" href="css/loading-animation.css">
     <link rel="stylesheet" href="tools/markdown-image-extractor/style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- 预先应用主题和加载动画 -->
-    <script src="js/preload-theme.js"></script>
+    <!-- 预先应用主题 -->
+    <script src="js/cache-manager.js"></script>
+    <script src="js/theme.js"></script>
     <script src="js/loading-animation.js"></script>
 </head>
 <body>
@@ -131,6 +132,7 @@
                 <div class="footer-links">
                     <a href="#" id="aboutLink" data-i18n="about">说明</a>
                     <a href="#" id="licenseLink" data-i18n="license">许可</a>
+                    <a href="#" id="clearCacheLink" data-i18n="clearCache">清除缓存</a>
                 </div>
             </div>
         </footer>
@@ -141,8 +143,6 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
     
     <!-- 核心脚本 -->
-    <script src="js/cookies.js"></script>
-    <script src="js/theme.js"></script>
     <script src="js/language.js"></script>
     <script src="js/main.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>

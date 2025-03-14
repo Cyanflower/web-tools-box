@@ -14,7 +14,10 @@
     "404Message": "Sorry, the page you are looking for does not exist. It might have been moved, deleted, or is temporarily unavailable.",
     "loading": "Loading",
     "loadError": "Failed to load content",
-    "toolInDevelopment": "Coming Soon"
+    "toolInDevelopment": "Coming Soon",
+    "clearCache": "Clear Cache",
+    "confirmClearCache": "Are you sure you want to clear all cache? This will reset all settings.",
+    "cacheCleared": "Cache cleared. The page will refresh."
   },
   "zh": {
     "theme": "主题",
@@ -31,6 +34,9 @@
     "404Message": "抱歉，您要查找的页面不存在。页面可能已被移动、删除或暂时无法访问。",
     "loading": "加载中",
     "loadError": "内容加载失败",
-    "toolInDevelopment": "开发中"
+    "toolInDevelopment": "开发中",
+    "clearCache": "清除缓存",
+    "confirmClearCache": "确定要清除所有缓存吗？这将重置所有设置。",
+    "cacheCleared": "缓存已清除，页面将刷新。"
   }
 } 

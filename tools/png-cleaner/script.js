@@ -25,6 +25,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const advancedModeOptions = document.querySelector('.advanced-mode-options');
     const essentialModeInfo = document.querySelector('.essential-mode-info');
     const chunkCheckboxes = document.querySelectorAll('.chunk-selector input[type="checkbox"]');
+    const resetSettingsButton = document.getElementById('reset-settings');
     
     // 全局变量
     let cleanedImages = [];
@@ -33,6 +34,113 @@ document.addEventListener('DOMContentLoaded', function() {
     let filenameMode = 'duplicate-counter'; // 默认文件命名模式
     let fileNameCounter = new Map(); // 用于记录每个基本文件名的计数，处理同名不同大小的文件
     let sequenceCounter = 1; // 用于按提交顺序命名的计数器
+    
+    // 缓存键
+    const CACHE_TOOL_ID = 'png-cleaner';
+    
+    // 默认设置
+    const DEFAULT_SETTINGS = {
+        cleanerMode: 'essential-only',
+        filenameMode: 'duplicate-counter',
+        selectedChunks: ['tEXt', 'zTXt', 'iTXt', 'iCCP']
+    };
+    
+    // 加载设置
+    function loadSettings() {
+        try {
+            // 加载工具设置
+            const settings = CacheManager.getToolSettings(CACHE_TOOL_ID);
+            if (settings) {
+                // 加载清理模式
+                currentMode = settings.cleanerMode || DEFAULT_SETTINGS.cleanerMode;
+                const modeRadio = document.querySelector(`input[name="cleaner-mode"][value="${currentMode}"]`);
+                if (modeRadio) {
+                    modeRadio.checked = true;
+                }
+                
+                // 加载文件命名方式
+                filenameMode = settings.filenameMode || DEFAULT_SETTINGS.filenameMode;
+                filenameSelect.value = filenameMode;
+                
+                // 加载选中的数据块
+                if (settings.selectedChunks && settings.selectedChunks.length > 0) {
+                    // 先重置所有复选框
+                    chunkCheckboxes.forEach(checkbox => {
+                        checkbox.checked = false;
+                    });
+                    
+                    // 然后设置保存的选择
+                    settings.selectedChunks.forEach(chunk => {
+                        const checkbox = document.getElementById(`chunk-${chunk}`);
+                        if (checkbox) {
+                            checkbox.checked = true;
+                        }
+                    });
+                }
+            }
+        } catch (error) {
+            console.error('加载设置失败:', error);
+            resetToDefaultSettings();
+        }
+    }
+    
+    // 保存设置
+    function saveSettings() {
+        try {
+            // 获取当前选中的数据块
+            const selectedChunks = [];
+            chunkCheckboxes.forEach(checkbox => {
+                if (checkbox.checked) {
+                    selectedChunks.push(checkbox.id.replace('chunk-', ''));
+                }
+            });
+            
+            // 保存设置
+            const settings = {
+                cleanerMode: currentMode,
+                filenameMode: filenameMode,
+                selectedChunks: selectedChunks
+            };
+            
+            CacheManager.setToolSettings(CACHE_TOOL_ID, settings);
+        } catch (error) {
+            console.error('保存设置失败:', error);
+        }
+    }
+    
+    // 重置为默认设置
+    function resetToDefaultSettings() {
+        // 重置清理模式
+        currentMode = DEFAULT_SETTINGS.cleanerMode;
+        const defaultModeRadio = document.querySelector(`input[name="cleaner-mode"][value="${currentMode}"]`);
+        if (defaultModeRadio) {
+            defaultModeRadio.checked = true;
+        }
+        
+        // 重置文件命名方式
+        filenameMode = DEFAULT_SETTINGS.filenameMode;
+        filenameSelect.value = filenameMode;
+        
+        // 重置选中的数据块
+        chunkCheckboxes.forEach(checkbox => {
+            const chunkType = checkbox.id.replace('chunk-', '');
+            checkbox.checked = DEFAULT_SETTINGS.selectedChunks.includes(chunkType);
+        });
+        
+        // 更新UI
+        updateModeSelection();
+        
+        // 保存默认设置
+        saveSettings();
+    }
+    
+    // 如果存在重置设置按钮，添加事件监听器
+    if (resetSettingsButton) {
+        resetSettingsButton.addEventListener('click', function() {
+            resetToDefaultSettings();
+            addLogEntry(LanguageManager.getText('settingsReset') || '设置已重置为默认值', 'success-msg');
+        });
+    }
     
     // 初始化上传区域事件
     uploadButton.addEventListener('click', function() {
@@ -51,6 +159,7 @@ document.addEventListener('DOMContentLoaded', function() {
             
             currentMode = this.value;
             updateModeSelection();
+            saveSettings();
         });
     });
     
@@ -79,7 +188,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (radio.value === 'essential-only') {
                     essentialModeInfo.style.display = 'block';
                     advancedModeOptions.style.display = 'none';
-                } else {
+                } else if (radio.value === 'advanced') {
                     essentialModeInfo.style.display = 'none';
                     advancedModeOptions.style.display = 'block';
                 }
@@ -140,6 +249,14 @@ document.addEventListener('DOMContentLoaded', function() {
     filenameSelect.addEventListener('change', function() {
         filenameMode = this.value;
         addLogEntry(`${LanguageManager.getText('filenameMode')}: ${this.options[this.selectedIndex].textContent}`);
+        saveSettings();
+    });
+    
+    // 为所有数据块复选框添加事件监听器
+    chunkCheckboxes.forEach(checkbox => {
+        checkbox.addEventListener('change', function() {
+            saveSettings();
+        });
     });
     
     // 处理上传的文件
@@ -184,7 +301,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if (currentMode === 'essential-only') {
             // 基本模式: 移除所有非必要chunk
             chunks.push('tEXt', 'zTXt', 'iTXt', 'bKGD', 'pHYs', 'sBIT', 'tIME', 'gAMA', 'cHRM', 'iCCP');
-        } else {
+        } else if (currentMode === 'advanced') {
             // 高级模式: 仅移除选择的chunk
             chunkCheckboxes.forEach(checkbox => {
                 if (checkbox.checked) {
@@ -510,6 +627,15 @@ document.addEventListener('DOMContentLoaded', function() {
         return new Uint8Array(newData).buffer;
     }
     
-    // 初始化设置
-    updateModeSelection();
+    // 初始化
+    function init() {
+        // 加载设置
+        loadSettings();
+        
+        // 更新UI
+        updateModeSelection();
+    }
+    
+    // 初始化
+    init();
 }); 

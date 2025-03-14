@@ -180,6 +180,11 @@
                                 </div>
                             </div>
                         </div>
+                        
+                        <!-- 设置操作按钮 -->
+                        <div class="setting-actions">
+                            <button class="settings-button" id="reset-settings" data-i18n="resetSettings">恢复默认值</button>
+                        </div>
                     </div>
                 </div>
                 
@@ -244,6 +249,7 @@
                 <div class="footer-links">
                     <a href="#" id="aboutLink" data-i18n="about">说明</a>
                     <a href="#" id="licenseLink" data-i18n="license">许可</a>
+                    <a href="#" id="clearCacheLink" data-i18n="clearCache">清除缓存</a>
                 </div>
             </div>
         </footer>
@@ -254,7 +260,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
     
     <!-- 核心脚本 -->
-    <script src="js/cookies.js"></script>
+    <script src="js/cache-manager.js"></script>
     <script src="js/theme.js"></script>
     <script src="js/language.js"></script>
     <script src="js/main.js"></script>

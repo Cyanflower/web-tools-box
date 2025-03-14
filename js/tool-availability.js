@@ -63,9 +63,28 @@ const ToolAvailabilityManager = (function() {
         // 获取所有工具卡片
         const cards = document.querySelectorAll('.tool-card');
         
+        // 尝试从缓存获取数据
+        const cachedData = CacheManager.getCache('TOOL_AVAILABILITY');
+        if (cachedData) {
+            // 使用缓存数据更新UI
+            cards.forEach(card => {
+                const onclickAttr = card.getAttribute('onclick') || '';
+                const urlMatch = onclickAttr.match(/window\.location\.href=['"](.*?)['"]/);
+                if (urlMatch && urlMatch[1]) {
+                    const toolUrl = urlMatch[1];
+                    if (!cachedData[toolUrl]) {
+                        disableToolCard(card);
+                    }
+                }
+            });
+            return;
+        }
+
+        // 如果没有缓存，进行实时检查
+        const availabilityData = {};
+        
         // 处理每个工具卡片
         for (const card of cards) {
-            // 获取原始onclick属性中的URL
             const onclickAttr = card.getAttribute('onclick') || '';
             const urlMatch = onclickAttr.match(/window\.location\.href=['"](.*?)['"]/);
             
@@ -75,16 +94,21 @@ const ToolAvailabilityManager = (function() {
                 try {
                     // 检查工具页面是否存在
                     const exists = await checkUrlExists(toolUrl);
+                    availabilityData[toolUrl] = exists;
                     
                     if (!exists) {
-                        // 如果页面不存在，禁用该工具卡片
                         disableToolCard(card);
                     }
                 } catch (error) {
                     console.error(`Error checking tool availability for ${toolUrl}:`, error);
+                    availabilityData[toolUrl] = false;
+                    disableToolCard(card);
                 }
             }
         }
+
+        // 保存检查结果到缓存
+        CacheManager.setCache('TOOL_AVAILABILITY', availabilityData);
     }
     
     // 当文档和翻译加载完成后初始化

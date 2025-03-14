@@ -32,6 +32,25 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
+    // 清理缓存按钮事件
+    const clearCacheLink = document.getElementById('clearCacheLink');
+    if (clearCacheLink) {
+        clearCacheLink.addEventListener('click', function(e) {
+            e.preventDefault();
+            
+            if (confirm(LanguageManager.getText('confirmClearCache') || '确定要清除所有缓存吗？这将重置所有设置。')) {
+                // 清除所有缓存
+                CacheManager.clearAllCache();
+                
+                // 显示成功消息
+                alert(LanguageManager.getText('cacheCleared') || '缓存已清除，页面将刷新。');
+                
+                // 刷新页面以应用更改
+                window.location.reload();
+            }
+        });
+    }
+    
     // 添加淡入动画类
     document.querySelectorAll('header, .hero-section, .tools-grid, footer').forEach(el => {
         el.classList.add('fade-in-target');

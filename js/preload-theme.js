@@ -4,39 +4,38 @@
  */
 (function() {
     try {
-        // 简化版的cookie读取函数
-        function getCookie(name) {
-            const cookieName = name + "=";
-            const decodedCookie = decodeURIComponent(document.cookie);
-            const cookieArray = decodedCookie.split(';');
-            
-            for (let i = 0; i < cookieArray.length; i++) {
-                let cookie = cookieArray[i];
-                while (cookie.charAt(0) === ' ') {
-                    cookie = cookie.substring(1);
-                }
-                if (cookie.indexOf(cookieName) === 0) {
-                    return cookie.substring(cookieName.length, cookie.length);
-                }
+        // 简化版的缓存读取函数
+        function getThemeSettings() {
+            try {
+                const cacheKey = 'theme_settings';
+                const cache = localStorage.getItem(cacheKey);
+                if (!cache) return null;
+                
+                const { version, data } = JSON.parse(cache);
+                return data;
+            } catch (error) {
+                console.error('读取主题设置失败:', error);
+                return null;
             }
-            return null;
         }
 
         // 添加无过渡效果的类
         document.documentElement.classList.add('no-transition');
         
-        const savedTheme = getCookie('web_tools_theme');
+        const settings = getThemeSettings();
         
-        if (savedTheme === 'dark') {
-            // 直接应用暗色主题到html元素
-            document.documentElement.style.colorScheme = 'dark';
-            document.documentElement.setAttribute('data-theme', 'dark');
-        } else if (savedTheme === 'auto') {
-            // 检查系统主题
-            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-            if (prefersDark) {
+        if (settings) {
+            if (settings.theme === 'dark') {
+                // 直接应用暗色主题到html元素
                 document.documentElement.style.colorScheme = 'dark';
                 document.documentElement.setAttribute('data-theme', 'dark');
+            } else if (settings.theme === 'auto') {
+                // 检查系统主题
+                const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+                if (prefersDark) {
+                    document.documentElement.style.colorScheme = 'dark';
+                    document.documentElement.setAttribute('data-theme', 'dark');
+                }
             }
         }
         

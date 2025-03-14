@@ -41,6 +41,111 @@ document.addEventListener('DOMContentLoaded', function() {
     let fileNameCounter = new Map(); // 用于记录每个基本文件名的计数，处理同名不同大小的文件
     let fileSequenceCounter = 1; // 用于数字序号命名
     
+    // 缓存键
+    const CACHE_TOOL_ID = 'image-converter';
+    const CACHE_PNG_TO_JPG = 'png-to-jpg-settings';
+    const CACHE_JPG_TO_PNG = 'jpg-to-png-settings';
+    
+    // 默认设置
+    const DEFAULT_SETTINGS = {
+        common: {
+            filenameMode: 'duplicate-counter'
+        },
+        [CACHE_PNG_TO_JPG]: {
+            jpgQuality: 90,
+            backgroundColor: '#ffffff',
+            preserveMetadata: true
+        },
+        [CACHE_JPG_TO_PNG]: {
+            preserveMetadata: true
+        }
+    };
+    
+    // 加载设置
+    function loadSettings() {
+        try {
+            // 加载通用设置
+            const commonSettings = CacheManager.getToolSettings(CACHE_TOOL_ID);
+            if (commonSettings && commonSettings.common) {
+                filenameMode = commonSettings.common.filenameMode || DEFAULT_SETTINGS.common.filenameMode;
+                filenameSelect.value = filenameMode;
+            }
+            
+            // 加载PNG转JPG设置
+            if (commonSettings && commonSettings[CACHE_PNG_TO_JPG]) {
+                const pngToJpgSettings = commonSettings[CACHE_PNG_TO_JPG];
+                jpgQualitySlider.value = pngToJpgSettings.jpgQuality || DEFAULT_SETTINGS[CACHE_PNG_TO_JPG].jpgQuality;
+                jpgQualityValue.textContent = jpgQualitySlider.value;
+                backgroundColorPicker.value = pngToJpgSettings.backgroundColor || DEFAULT_SETTINGS[CACHE_PNG_TO_JPG].backgroundColor;
+                colorValueInput.value = backgroundColorPicker.value;
+                preserveMetadataJpg.checked = pngToJpgSettings.preserveMetadata !== undefined ? 
+                    pngToJpgSettings.preserveMetadata : DEFAULT_SETTINGS[CACHE_PNG_TO_JPG].preserveMetadata;
+            }
+            
+            // 加载JPG转PNG设置
+            if (commonSettings && commonSettings[CACHE_JPG_TO_PNG]) {
+                const jpgToPngSettings = commonSettings[CACHE_JPG_TO_PNG];
+                preserveMetadataPng.checked = jpgToPngSettings.preserveMetadata !== undefined ? 
+                    jpgToPngSettings.preserveMetadata : DEFAULT_SETTINGS[CACHE_JPG_TO_PNG].preserveMetadata;
+            }
+        } catch (error) {
+            console.error('加载设置失败:', error);
+            // 使用默认设置
+            resetToDefaultSettings();
+        }
+    }
+    
+    // 保存设置
+    function saveSettings() {
+        try {
+            // 获取当前所有设置
+            const settings = CacheManager.getToolSettings(CACHE_TOOL_ID) || {};
+            
+            // 更新通用设置
+            settings.common = {
+                filenameMode: filenameMode
+            };
+            
+            // 更新PNG转JPG设置
+            settings[CACHE_PNG_TO_JPG] = {
+                jpgQuality: parseInt(jpgQualitySlider.value),
+                backgroundColor: backgroundColorPicker.value,
+                preserveMetadata: preserveMetadataJpg.checked
+            };
+            
+            // 更新JPG转PNG设置
+            settings[CACHE_JPG_TO_PNG] = {
+                preserveMetadata: preserveMetadataPng.checked
+            };
+            
+            // 保存设置
+            CacheManager.setToolSettings(CACHE_TOOL_ID, settings);
+        } catch (error) {
+            console.error('保存设置失败:', error);
+        }
+    }
+    
+    // 重置为默认设置
+    function resetToDefaultSettings() {
+        // 重置通用设置
+        filenameMode = DEFAULT_SETTINGS.common.filenameMode;
+        filenameSelect.value = filenameMode;
+        
+        // 重置PNG转JPG设置
+        jpgQualitySlider.value = DEFAULT_SETTINGS[CACHE_PNG_TO_JPG].jpgQuality;
+        jpgQualityValue.textContent = jpgQualitySlider.value;
+        backgroundColorPicker.value = DEFAULT_SETTINGS[CACHE_PNG_TO_JPG].backgroundColor;
+        colorValueInput.value = backgroundColorPicker.value;
+        colorValueInput.classList.remove('invalid');
+        preserveMetadataJpg.checked = DEFAULT_SETTINGS[CACHE_PNG_TO_JPG].preserveMetadata;
+        
+        // 重置JPG转PNG设置
+        preserveMetadataPng.checked = DEFAULT_SETTINGS[CACHE_JPG_TO_PNG].preserveMetadata;
+        
+        // 保存默认设置
+        saveSettings();
+    }
+    
     // 初始化上传区域事件
     uploadButton.addEventListener('click', function() {
         fileInput.click();
@@ -50,6 +155,7 @@ document.addEventListener('DOMContentLoaded', function() {
     filenameSelect.addEventListener('change', function() {
         filenameMode = this.value;
         addLogEntry(`${LanguageManager.getText('filenameMode')}: ${this.options[this.selectedIndex].textContent}`);
+        saveSettings();
     });
     
     // 初始化转换模式选择
@@ -120,12 +226,20 @@ document.addEventListener('DOMContentLoaded', function() {
         jpgQualityValue.textContent = this.value;
     });
     
+    jpgQualitySlider.addEventListener('change', function() {
+        saveSettings();
+    });
+    
     // 颜色选择器和十六进制输入框的双向绑定
     
     // 颜色选择器更新时更新输入框
     backgroundColorPicker.addEventListener('input', function() {
         colorValueInput.value = this.value;
         colorValueInput.classList.remove('invalid');
+    });
+    
+    backgroundColorPicker.addEventListener('change', function() {
+        saveSettings();
     });
     
     // 十六进制输入框更新时更新颜色选择器
@@ -164,26 +278,23 @@ document.addEventListener('DOMContentLoaded', function() {
             this.value = `#${r}${r}${g}${g}${b}${b}`;
             backgroundColorPicker.value = this.value;
         }
+        
+        saveSettings();
+    });
+    
+    // 保留元数据复选框更改事件
+    preserveMetadataJpg.addEventListener('change', function() {
+        saveSettings();
+    });
+    
+    preserveMetadataPng.addEventListener('change', function() {
+        saveSettings();
     });
     
     // 重置设置按钮
     resetSettingsButton.addEventListener('click', function() {
-        // 重置JPG质量
-        jpgQualitySlider.value = 90;
-        jpgQualityValue.textContent = '90';
-        
-        // 重置背景颜色
-        backgroundColorPicker.value = '#ffffff';
-        colorValueInput.value = '#ffffff';
-        colorValueInput.classList.remove('invalid');
-        
-        // 重置保留元数据选项
-        preserveMetadataJpg.checked = true;
-        preserveMetadataPng.checked = true;
-        
-        // 重置数字序号命名选项
-        filenameMode = 'duplicate-counter';
-        filenameSelect.value = 'duplicate-counter';
+        resetToDefaultSettings();
+        addLogEntry(LanguageManager.getText('settingsReset') || '设置已重置为默认值', 'success-msg');
     });
     
     // 文件选择事件
@@ -536,7 +647,16 @@ document.addEventListener('DOMContentLoaded', function() {
         return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
     }
     
-    // 初始化设置
-    updateModeSelection();
-    updateFileInputAcceptType();
+    // 初始化
+    function init() {
+        // 加载设置
+        loadSettings();
+        
+        // 更新UI
+        updateModeSelection();
+        updateFileInputAcceptType();
+    }
+    
+    // 初始化
+    init();
 });

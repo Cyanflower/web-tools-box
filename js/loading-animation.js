@@ -66,7 +66,7 @@ const LoadingManager = (function() {
             } else if (progressPercent < 60) {
                 loadingMessage.textContent = '正在处理翻译...';
             } else if (progressPercent < 90) {
-                loadingMessage.textContent = '即将完成...';
+                loadingMessage.textContent = '正在检查工具可用性...';
             } else {
                 loadingMessage.textContent = '准备就绪!';
             }
@@ -153,10 +153,14 @@ const LoadingManager = (function() {
         // 监听自定义事件
         document.addEventListener('translationsLoaded', () => {
             setResourceLoaded('TRANSLATIONS');
-        });
-        
-        document.addEventListener('scriptsLoaded', () => {
-            setResourceLoaded('SCRIPTS');
+            // 在翻译加载完成后初始化工具可用性检查
+            if (window.ToolAvailabilityManager) {
+                ToolAvailabilityManager.init().then(() => {
+                    setResourceLoaded('SCRIPTS');
+                });
+            } else {
+                setResourceLoaded('SCRIPTS');
+            }
         });
     }
     

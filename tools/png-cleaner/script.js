@@ -31,7 +31,6 @@ document.addEventListener('DOMContentLoaded', function() {
     let zip = null;
     let currentMode = 'essential-only'; // 默认清理模式
     let filenameMode = 'duplicate-counter'; // 默认文件命名模式
-    let processedFileIdentifiers = new Set(); // 用于存储已处理的文件标识符（文件名+大小），防止重复上传
     let fileNameCounter = new Map(); // 用于记录每个基本文件名的计数，处理同名不同大小的文件
     let sequenceCounter = 1; // 用于按提交顺序命名的计数器
     
@@ -58,7 +57,6 @@ document.addEventListener('DOMContentLoaded', function() {
     // 清空结果区域的函数
     function clearResults() {
         cleanedImages = [];
-        processedFileIdentifiers.clear(); // 清空已处理文件标识符集合
         fileNameCounter.clear(); // 清空文件名计数器
         sequenceCounter = 1; // 重置顺序计数器
         cleanedImagesContainer.innerHTML = '';
@@ -166,31 +164,15 @@ document.addEventListener('DOMContentLoaded', function() {
             zip = new JSZip();
         }
         
-        // 过滤掉重复文件 - 使用文件名+大小作为唯一标识
-        const uniqueFiles = validFiles.filter(file => {
-            // 创建文件唯一标识：文件名 + 文件大小
-            const fileIdentifier = `${file.name}_${file.size}`;
-            
-            if (processedFileIdentifiers.has(fileIdentifier)) {
-                // 记录日志，提示用户该文件已处理过
-                addLogEntry(`${file.name} ${LanguageManager.getText('fileAlreadyProcessed')}`, 'warning-msg');
-                return false;
-            }
-            return true;
-        });
-        
         // 更新统计数字（总文件数增加新的有效文件数量）
         const currentTotalFiles = parseInt(totalFilesEl.textContent);
-        totalFilesEl.textContent = currentTotalFiles + uniqueFiles.length;
+        totalFilesEl.textContent = currentTotalFiles + validFiles.length;
         
         // 获取要移除的chunk类型
         const chunksToRemove = getChunksToRemove();
         
         // 逐个处理文件
-        uniqueFiles.forEach((file, index) => {
-            // 将文件标识符添加到已处理集合中
-            const fileIdentifier = `${file.name}_${file.size}`;
-            processedFileIdentifiers.add(fileIdentifier);
+        validFiles.forEach((file, index) => {
             cleanPNG(file, chunksToRemove, cleanedImages.length + index);
         });
     }

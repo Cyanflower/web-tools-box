@@ -167,7 +167,18 @@ function convertMdToSillyTavernPreset(mdContent) {
         
         // 设置内容 (跳过头部行)
         const contentLines = lines.slice(1);
-        const content = contentLines.join('\n').trim();
+        // 确保内容末尾的换行符被保留，同时去除开头的空白
+        let content = contentLines.join('\n');
+        
+        // 去除开头的空白，保留内容
+        const trimStartContent = content.trimStart();
+        
+        // 只在非空内容且不以换行符结尾时添加换行符，不在原内容已有换行符时额外添加
+        if (trimStartContent.length > 0 && !trimStartContent.endsWith('\n')) {
+            content = trimStartContent + '\n';
+        } else {
+            content = trimStartContent;
+        }
         
         // 初始化基本参数
         const prompt = {
@@ -340,7 +351,11 @@ function convertJsonToMarkdownFormat(jsonContent) {
             if (markerIdentifiers.includes(prompt.identifier)) {
                 mdContent += header + '\n';
             } else {
-                mdContent += header + '\n' + (prompt.content || '');
+                // 获取内容并确保保留结尾的换行符
+                let content = prompt.content || '';
+                
+                // 添加到内容中
+                mdContent += header + '\n' + content;
             }
         });
         
@@ -467,7 +482,12 @@ function convertToRegionFolding(mdContent) {
         
         // 添加@@@结尾标记
         if (section.startsWith('§§§')) {
-            return section.trim() + '\n@@@';
+            // 确保内容末尾有一个换行符，然后添加@@@
+            if (section.endsWith('\n')) {
+                return section + '@@@';
+            } else {
+                return section + '\n@@@';
+            }
         }
         
         return section;
@@ -488,10 +508,30 @@ function convertFromRegionFolding(mdContent) {
     // 标准化换行符
     mdContent = mdContent.replace(/\r\n/g, '\n');
     
-    // 移除@@@结束标记（考虑可能的多种换行符情况）
-    mdContent = mdContent.replace(/\n?@@@\s*\n?/g, '\n');
+    // 特殊处理@@@标记
+    // 这里的关键点是保留@@@前的所有内容（包括换行符）
+    const lines = mdContent.split('\n');
+    const resultLines = [];
     
-    return mdContent;
+    for (let i = 0; i < lines.length; i++) {
+        // 如果这行只有@@@或@@@加一些空格，就跳过这行
+        if (/^\s*@@@\s*$/.test(lines[i])) {
+            continue;
+        }
+        
+        // 如果这行末尾有@@@标记
+        if (lines[i].includes('@@@')) {
+            // 移除行末的@@@和前面可能的空格
+            const cleanedLine = lines[i].replace(/\s*@@@\s*$/, '');
+            if (cleanedLine.trim().length > 0) {
+                resultLines.push(cleanedLine);
+            }
+        } else {
+            resultLines.push(lines[i]);
+        }
+    }
+    
+    return resultLines.join('\n');
 }
 
 // 添加事件监听器

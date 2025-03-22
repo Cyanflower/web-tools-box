@@ -86,34 +86,26 @@
                     
                     <div id="md-to-json" class="tab-content active">
                         <div class="section">
+                            <p><strong data-i18n="noteFormat"></strong></p>
                             <h3 data-i18n="formatExample">示例格式:</h3>
                             <div class="sample" id="sampleArea">
                                 <pre>
-§§§ 千面之主|system|main
-You are Nyarlathotep, The Crawling Chaos...
+§§§ 酒馆内置提示|system|main
+这是一条酒馆内置的不可删除提示
 @@@
-
-§§§ 瑟琴规范|system|nsfw
-&lt;intimacy_laws&gt;
-[For sexual contents]
-...
-&lt;/intimacy_laws&gt;
+§§§ 这是默认不能编辑内容的MARKER|undefined|scenario
 @@@
-
-§§§ 自定义深度|system|1
-这个提示有自定义的注入深度(1)
+§§§ 自定义深度|assistant|1
+这个提示有自定义的注入深度(1)，会加载为相对深度的预设项目
 @@@
-
-§§§ 普通提示|system
-这个提示没有特殊标识符，会自动分配数字标识符
+§§§ 普通提示|user
+这个提示没有特殊标识符，会自动分配数字标识符（1,2,3,4）
 @@@
-
-§§§ 禁用的提示词|system|enhanceDefinitions(禁用)
+§§§ 禁用的提示词|system|(禁用)
 这个提示词被标记为禁用状态，转换后不会自动启用
 @@@
                                 </pre>
                             </div>
-                            <p><strong data-i18n="noteFormat">注意：</strong>工具现已支持带有@@@结束标记的折叠格式。</p>
                         </div>
                         
                         <div class="section">

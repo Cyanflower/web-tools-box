@@ -534,6 +534,22 @@ function convertFromRegionFolding(mdContent) {
     return resultLines.join('\n');
 }
 
+/**
+ * 切换扩展说明区域的显示/隐藏状态
+ */
+function toggleExtendedDesc() {
+    const toggle = document.querySelector('.description-toggle');
+    const content = document.getElementById('extendedDescContent');
+    
+    if (content.classList.contains('active')) {
+        content.classList.remove('active');
+        toggle.classList.remove('active');
+    } else {
+        content.classList.add('active');
+        toggle.classList.add('active');
+    }
+}
+
 // 添加事件监听器
 document.addEventListener('DOMContentLoaded', function() {
     // 文件输入变更事件处理
@@ -592,4 +608,12 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     });
+
+    // 页面加载时初始化状态
+    const toggle = document.querySelector('.description-toggle');
+    if (toggle) {
+        // 默认为折叠状态
+        document.getElementById('extendedDescContent').classList.remove('active');
+        toggle.classList.remove('active');
+    }
 }); 

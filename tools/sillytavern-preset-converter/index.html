@@ -78,18 +78,90 @@
                     这个工具可以帮助你在Markdown格式和JSON格式之间转换SillyTavern预设，让预设创建和编辑变得更加简单。
                 </p>
                 
-                <div class="converter-container">
-                    <div class="tabs">
-                        <div class="tab active" onclick="showTab('md-to-json')" data-i18n="mdToJson">MD转JSON</div>
-                        <div class="tab" onclick="showTab('json-to-md')" data-i18n="jsonToMd">JSON转MD</div>
+                <div class="extended-description">
+                    <div class="description-toggle" onclick="toggleExtendedDesc()">
+                        <i class="fas fa-chevron-down"></i>
+                        <span data-i18n="showDetailedGuide">展示详细使用指南</span>
                     </div>
-                    
-                    <div id="md-to-json" class="tab-content active">
-                        <div class="section">
-                            <p><strong data-i18n="noteFormat"></strong></p>
-                            <h3 data-i18n="formatExample">示例格式:</h3>
-                            <div class="sample" id="sampleArea">
-                                <pre>
+                    <div class="extended-description-content" id="extendedDescContent">
+                        <div class="guide-section">
+                            <h3 data-i18n="vsCodeSetupTitle">VS Code 配置指南</h3>
+                            <p data-i18n="vsCodeSetupDesc">本工具旨在方便用户使用外部编辑器(如VS Code)编写Silly Tavern预设。请按照以下步骤配置您的VS Code环境：</p>
+                            
+                            <div class="guide-step">
+                                <h4 data-i18n="extensionsTitle">必要扩展</h4>
+                                <p data-i18n="extensionsDesc">请在VS Code中安装以下扩展：</p>
+                                <ul>
+                                    <li>Region Folding for VS Code</li>
+                                    <li>Highlight</li>
+                                </ul>
+                            </div>
+                            
+                            <div class="guide-step">
+                                <h4 data-i18n="settingsTitle">必要设置</h4>
+                                <p data-i18n="settingsDesc">在您的VS Code settings.json中添加以下配置：</p>
+                                <pre class="code-block">
+{
+    "highlight.regexes": {
+      "(\\§\\§\\§\\s+[^\\n]+)": {
+        "filterFileRegex": ".*$",
+        "decorations": [
+          {
+            "overviewRulerColor": "#da985b",
+            "backgroundColor": "transparent",
+            "color": "#da985b",
+            "fontWeight": "bold"
+          },
+          {
+            "backgroundColor": "#da985b",
+            "color": "#1f1f1f"
+          }
+        ]
+      },
+      "(@@@\\n)": {
+        "filterFileRegex": ".*$",
+        "decorations": [
+          {
+            "overviewRulerColor": "#da985b",
+            "backgroundColor": "transparent",
+            "color": "#da985b",
+            "fontWeight": "bold"
+          },
+          {
+            "backgroundColor": "#da985b",
+            "color": "#1f1f1f"
+          }
+        ]
+      }
+    },
+    "maptz.regionfolder": {
+      "[markdown]": {
+        "foldStartRegex": "[\\s]*§§§[\\s]*(.*)",
+        "foldEndRegex": "[\\s]*@@@",
+        "disableFolding": false
+      }
+    }
+}
+                                </pre>
+                            </div>
+                            
+                            <div class="guide-step">
+                                <h4 data-i18n="usageTitle">使用方法</h4>
+                                <p data-i18n="usageDesc">配置完成后，您可以：</p>
+                                <ol>
+                                    <li data-i18n="usageStep1">将JSON格式的预设转换为MD格式</li>
+                                    <li data-i18n="usageStep2">在VS Code中编辑生成的MD文件，享受IDE的高级功能和项目折叠高亮</li>
+                                    <li data-i18n="usageStep3">编辑完成后，将MD格式转换回JSON格式</li>
+                                    <li data-i18n="usageStep4">将JSON导入到SillyTavern中使用，注意有一些配置需要手动调整</li>
+                                </ol>
+                            </div>
+                            
+                            <div class="guide-step">
+                                <h4 data-i18n="mdFormatTitle">Markdown格式说明</h4>
+                                <p data-i18n="noteFormat">工具采用§§§作为开始标记，@@@作为结束标记的折叠格式。</p>
+                                <h5 data-i18n="formatExample">MD格式示例:</h5>
+                                <div class="sample">
+                                    <pre>
 §§§ 酒馆内置提示|system|main
 这是一条酒馆内置的不可删除提示
 @@@
@@ -104,10 +176,20 @@
 §§§ 禁用的提示词|system|(禁用)
 这个提示词被标记为禁用状态，转换后不会自动启用
 @@@
-                                </pre>
+                                    </pre>
+                                </div>
                             </div>
                         </div>
-                        
+                    </div>
+                </div>
+                
+                <div class="converter-container">
+                    <div class="tabs">
+                        <div class="tab active" onclick="showTab('md-to-json')" data-i18n="mdToJson">MD转JSON</div>
+                        <div class="tab" onclick="showTab('json-to-md')" data-i18n="jsonToMd">JSON转MD</div>
+                    </div>
+                    
+                    <div id="md-to-json" class="tab-content active">
                         <div class="section">
                             <h3 data-i18n="inputMdContent">输入Markdown内容:</h3>
                             <textarea id="inputAreaMd" class="converter-textarea" placeholder="" data-i18n-placeholder="pasteOrWrite"></textarea>

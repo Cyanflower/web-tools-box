@@ -8,6 +8,99 @@
     margin-top: 20px;
 }
 
+/* 扩展说明区域样式 */
+.extended-description {
+    background-color: var(--card-bg);
+    border-radius: var(--border-radius);
+    border: 1px solid var(--border-color);
+    margin: 20px 0;
+    overflow: hidden;
+}
+
+.description-toggle {
+    display: flex;
+    align-items: center;
+    padding: 15px;
+    cursor: pointer;
+    background-color: var(--card-bg);
+    transition: background-color 0.3s;
+    font-weight: 500;
+}
+
+.description-toggle:hover {
+    background-color: var(--hover-color);
+}
+
+.description-toggle i {
+    transition: transform 0.3s;
+    margin-right: 10px;
+}
+
+.description-toggle.active i {
+    transform: rotate(180deg);
+}
+
+.extended-description-content {
+    display: none;
+    padding: 0 20px 20px;
+    animation: slideDown 0.3s ease-out;
+}
+
+.extended-description-content.active {
+    display: block;
+}
+
+@keyframes slideDown {
+    from { 
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to { 
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.guide-section {
+    margin-bottom: 15px;
+}
+
+.guide-step {
+    margin: 15px 0;
+    padding-left: 15px;
+    border-left: 3px solid var(--primary-color);
+}
+
+.guide-step h4 {
+    margin-top: 0;
+    margin-bottom: 10px;
+    color: var(--primary-color);
+}
+
+.guide-step ul, .guide-step ol {
+    padding-left: 1.5rem;
+    margin: 10px 0;
+}
+
+.guide-step li {
+    margin-bottom: 8px;
+    padding-left: 0.5rem;
+}
+
+.code-block {
+    background-color: var(--bg-color);
+    padding: 15px;
+    border-radius: 8px;
+    overflow-x: auto;
+    font-family: 'Consolas', monospace;
+    font-size: 0.9em;
+    line-height: 1.5;
+    margin: 15px 0;
+    white-space: pre-wrap;
+    max-height: 300px;
+    overflow-y: auto;
+}
+
 /* 标签页样式 */
 .tabs {
     display: flex;

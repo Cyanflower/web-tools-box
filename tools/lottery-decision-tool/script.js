@@ -300,6 +300,14 @@ function initLotteryDecisionTool() {
             notification.classList.add('show');
         }, 10);
 
+        // 如果是错误类型，给容器添加抖动效果
+        if (type === 'error') {
+            const container = document.querySelector('.tool-content');
+            if (container) {
+                shakeElement(container);
+            }
+        }
+
         // 自动消失
         setTimeout(() => {
             notification.classList.remove('show');
@@ -322,28 +330,35 @@ function initLotteryDecisionTool() {
         const optionRows = elements.optionsContainer.querySelectorAll('.option-row');
         if (optionRows.length < 2) {
             showNotification(getText('atLeastTwoOptions', '请至少添加两个选项'));
-            shakeElement(elements.blueTab);
+            shakeElement(elements.optionsContainer);
             return false;
         }
 
         if (!elements.title.value.trim()) {
             showNotification(getText('enterTitle', '请输入抽签标题'));
-            shakeElement(elements.blueTab);
+            shakeElement(elements.title);
             return false;
         }
 
         // 检查是否所有选项都有内容
         let allValid = true;
+        let firstInvalidInput = null;
         optionRows.forEach(row => {
             const input = row.querySelector('.option-input');
             if (!input.value.trim()) {
                 allValid = false;
+                if (!firstInvalidInput) {
+                    firstInvalidInput = input;
+                }
             }
         });
 
         if (!allValid) {
             showNotification(getText('allOptionsMustHaveContent', '请确保所有选项都有内容'));
-            shakeElement(elements.blueTab);
+            if (firstInvalidInput) {
+                shakeElement(firstInvalidInput.closest('.option-row'));
+                firstInvalidInput.focus();
+            }
             return false;
         }
 
@@ -351,7 +366,7 @@ function initLotteryDecisionTool() {
         const remaining = parseInt(elements.blueRemaining.textContent);
         if (remaining !== 0) {
             showNotification(getText('distributeAllWeightPoints', `您需要分配完所有10个权重点数，当前还剩: ${remaining}`).replace('{remaining}', remaining));
-            shakeElement(elements.blueTab);
+            shakeElement(elements.blueWeightBar);
             return false;
         }
 
@@ -438,7 +453,7 @@ function initLotteryDecisionTool() {
         const remaining = parseInt(elements.redRemaining.textContent);
         if (remaining !== 0) {
             showNotification(getText('distributeAllWeightPoints', `您需要分配完所有10个权重点数，当前还剩: ${remaining}`).replace('{remaining}', remaining));
-            shakeElement(elements.redTab);
+            shakeElement(elements.redWeightBar);
             return false;
         }
 
@@ -468,6 +483,15 @@ function initLotteryDecisionTool() {
     // 生成随机结果
     function generateRandomResult() {
         if (!saveStep2Data()) return;
+
+        // 在生成结果之前添加整体抖动效果
+        const redOptionsSection = document.getElementById('red-options-section');
+        if (redOptionsSection) {
+            redOptionsSection.classList.add('shake');
+            setTimeout(() => {
+                redOptionsSection.classList.remove('shake');
+            }, 500);
+        }
 
         // 创建一个随机数生成的视觉效果
         const randomEffectContainer = document.createElement('div');
@@ -531,6 +555,14 @@ function initLotteryDecisionTool() {
 
             // 启用确认按钮
             elements.confirmResult.disabled = false;
+            elements.confirmResult.classList.add('pulse');
+            
+            // 高亮显示确认按钮
+            setTimeout(() => {
+                if (elements.confirmResult.classList.contains('pulse')) {
+                    elements.confirmResult.classList.remove('pulse');
+                }
+            }, 3000);
 
             // 0.5秒后自动移除随机效果容器
             setTimeout(() => {
@@ -792,6 +824,12 @@ function initLotteryDecisionTool() {
             // 更改按钮样式，提示成功
             elements.copyText.innerHTML = `<i class="fas fa-check"></i> ${getText('copied', '复制成功')}`;
             elements.copyText.classList.add('copy-success');
+            
+            // 添加视觉反馈 - 抖动文本框
+            elements.encryptedText.classList.add('shake');
+            setTimeout(() => {
+                elements.encryptedText.classList.remove('shake');
+            }, 500);
 
             // 3秒后恢复按钮状态
             setTimeout(() => {
@@ -802,6 +840,7 @@ function initLotteryDecisionTool() {
         } catch (err) {
             console.error('复制失败:', err);
             showNotification(getText('copyFailed', '复制失败，请手动复制文本'), 'error');
+            shakeElement(elements.encryptedText);
         }
     }
 

@@ -8,8 +8,8 @@
     "tool3Desc": "Remove extra chunks from PNG files",
     "tool4": "SillyTavern Preset Converter",
     "tool4Desc": "Convert between Markdown and JSON formats for SillyTavern presets",
-    "tool5": "Tool 5",
-    "tool5Desc": "Coming Soon",
+    "tool5": "Lottery Decision Tool",
+    "tool5Desc": "Help two people make fair decisions",
     "tool6": "Tool 6",
     "tool6Desc": "Coming Soon"
   },
@@ -22,8 +22,8 @@
     "tool3Desc": "清理PNG文件中的额外数据块",
     "tool4": "SillyTavern预设转换工具",
     "tool4Desc": "在Markdown和JSON格式之间转换SillyTavern预设",
-    "tool5": "工具 5",
-    "tool5Desc": "开发中",
+    "tool5": "抽签决策工具",
+    "tool5Desc": "帮助两人公平决策的随机抽签",
     "tool6": "工具 6",
     "tool6Desc": "开发中"
   }

@@ -174,6 +174,17 @@ const LanguageManager = (function() {
             }
         });
         
+        // 应用翻译到所有带有 data-i18n-placeholder 属性的元素
+        const placeholderElements = document.querySelectorAll('[data-i18n-placeholder]');
+        placeholderElements.forEach(element => {
+            const key = element.getAttribute('data-i18n-placeholder');
+            if (translations[lang][key]) {
+                element.placeholder = translations[lang][key];
+            } else {
+                console.warn(`Translation for placeholder key "${key}" not found in language "${lang}".`);
+            }
+        });
+        
         // 更新 HTML 语言属性
         document.documentElement.lang = lang;
         

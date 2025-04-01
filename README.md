@@ -34,7 +34,9 @@ Web Tools 是一个纯前端的在线工具集，旨在为用户提供方便实�
 - **图片格式转换器**：PNG 转 JPG 时会丢失透明度，可以设置背景颜色
 - **PNG 清理工具**：基本模式适合大多数用户，高级模式允许更精细控制
 - **Markdown 图片提取器**：支持标准 Markdown 语法中的 base64 编码图片
-- **测试**：项目可以在本地通过 live-server 测试：`live-server --mount=/web-tools-box:. --port=xxxx`
+- **SillyTavern 预设编写工具**：在 Markdown 和 JSON 格式之间转换 SillyTavern 预设
+- **决策抽签工具**：两人分别设置权重进行公平抽签决策
+- **测试**：项目可以在本地通过 live-server 测试：`live-server --mount=/web-tools-box:. --port=8088`
 
 ## 兼容性
 

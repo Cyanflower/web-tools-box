@@ -73,8 +73,8 @@ function initLotteryDecisionTool() {
 
     // 获取翻译文本的辅助函数
     function getText(key, defaultText = '') {
-        return (window.LanguageManager && window.LanguageManager.getText) 
-            ? window.LanguageManager.getText(key) 
+        return (LanguageManager && LanguageManager.getText) 
+            ? LanguageManager.getText(key) 
             : defaultText;
     }
 
@@ -498,12 +498,10 @@ function initLotteryDecisionTool() {
         }, 0);
 
         // 显示随机数滚动效果
-        let counter = 0;
         const randomInterval = setInterval(() => {
             // 生成随机显示数字（仅用于动画效果，与实际结果无关）
             const randomValue = Math.floor(Math.random() * 100) + 1;
             randomNumberDisplay.innerHTML = `<span>${randomValue}</span>`;
-            counter++;
         }, 100);
 
         // 生成真正的随机数和结果，但不显示出来

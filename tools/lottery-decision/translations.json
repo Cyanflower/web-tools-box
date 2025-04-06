@@ -1,6 +1,6 @@
 {
   "en": {
-    "lotteryDecisionTool": "Lottery Decision Tool",
+    "lotteryDecisionTool": "Lottery Decision",
     "lotteryDecisionToolDesc": "Fair decision making with dual-weighted options",
     "lotteryDecisionToolLongDesc": "This is a two-player lottery decision tool that allows both parties to set option weights and generate a random result. It's ideal for those with choice paralysis, team decisions, or scenarios requiring fair problem resolution.",
     
@@ -62,7 +62,7 @@
     "decrease": "Decrease weight"
   },
   "zh": {
-    "lotteryDecisionTool": "抽签决策工具",
+    "lotteryDecisionTool": "抽签决策",
     "lotteryDecisionToolDesc": "两人分别设置权重进行公平抽签决策",
     "lotteryDecisionToolLongDesc": "这是一个双人抽签决策工具，可以让两方各自设置选项权重，最终生成随机结果。适合用于选择困难症患者、团队决策或需要公平解决问题的场景。",
     

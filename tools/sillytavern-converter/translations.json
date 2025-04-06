@@ -1,10 +1,10 @@
 {
   "en": {
-    "stPresetConverter": "SillyTavern Preset Converter",
-    "stPresetConverterDesc": "Convert between Markdown and JSON formats for SillyTavern presets",
-    "stPresetConverterLongDesc": "This tool helps you convert between Markdown format and JSON format for SillyTavern presets, making preset creation and editing much easier with external editors.",
-    "showDetailedGuide": "Show Detailed Usage Guide",
-    "vsCodeSetupTitle": "Setup Guide",
+    "stPresetConverter": "SillyTavern Converter",
+    "stPresetConverterDesc": "Convert between multiple formats for SillyTavern presets and logs",
+    "stPresetConverterLongDesc": "This tool helps you convert between multiple formats for SillyTavern presets and logs, making preset editing and log export much easier with external editors.",
+    "showDetailedGuide": "Show Preset Related Detailed Usage Guide",
+    "vsCodeSetupTitle": "VS Code Setup Guide",
     "vsCodeSetupDesc": "This tool is designed to help users write Silly Tavern presets using external editors like VS Code. Please follow these steps to set up your VS Code environment:",
     "extensionsTitle": "Required Extensions",
     "extensionsDesc": "Please install the following extensions in VS Code:",
@@ -43,16 +43,16 @@
     "noMdContent": "Please enter Markdown content",
     "noJsonContent": "Please enter JSON content",
     "conversionFailed": "Conversion failed",
-    "toolTitle": "SillyTavern Preset Converter",
-    "toolSubtitle": "Making preset creation easier",
-    "essential": "SillyTavern preset converter tool"
+    "toolTitle": "SillyTavern Converter",
+    "toolSubtitle": "Making preset editing and log export easier",
+    "essential": "SillyTavern converter tool"
   },
   "zh": {
-    "stPresetConverter": "SillyTavern预设转换工具",
-    "stPresetConverterDesc": "在Markdown和JSON格式之间转换SillyTavern预设",
-    "stPresetConverterLongDesc": "这个工具可以帮助你在Markdown格式和JSON格式之间转换SillyTavern预设，让你能够使用外部编辑器更轻松地创建和编辑预设。",
-    "showDetailedGuide": "显示详细使用指南",
-    "vsCodeSetupTitle": "配置指南",
+    "stPresetConverter": "SillyTavern转换工具",
+    "stPresetConverterDesc": "在多种格式之间转换SillyTavern预设和log",
+    "stPresetConverterLongDesc": "这个工具可以帮助你在多种格式之间转换SillyTavern预设和log，让你能够使用外部编辑器更轻松地编辑预设和导出对话。",
+    "showDetailedGuide": "显示预设相关使用指南",
+    "vsCodeSetupTitle": "VS Code 配置指南",
     "vsCodeSetupDesc": "本工具旨在方便用户使用外部编辑器(如VS Code)编写Silly Tavern预设。请按照以下步骤配置您的VS Code环境：",
     "extensionsTitle": "必要扩展",
     "extensionsDesc": "请在VS Code中安装以下扩展：",
@@ -91,8 +91,8 @@
     "noMdContent": "请输入Markdown内容",
     "noJsonContent": "请输入JSON内容",
     "conversionFailed": "转换失败",
-    "toolTitle": "SillyTavern预设转换工具",
-    "toolSubtitle": "让预设编写更简单",
-    "essential": "SillyTavern预设转换工具"
+    "toolTitle": "SillyTavern转换工具",
+    "toolSubtitle": "让预设编辑和对话导出更简单",
+    "essential": "SillyTavern转换工具"
   }
 } 

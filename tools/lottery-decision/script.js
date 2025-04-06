@@ -199,7 +199,7 @@ function initLotteryDecisionTool() {
         void counterElement.offsetWidth; // 触发重绘
         counterElement.classList.add(change > 0 ? 'count-up' : 'count-down');
 
-        // 更新父元素中的按钮状态
+        // 父元素中的按钮状态
         const controls = counterElement.nextElementSibling;
         const decreaseBtn = controls.querySelector('.weight-decrease');
         const increaseBtn = controls.querySelector('.weight-increase');
@@ -211,11 +211,11 @@ function initLotteryDecisionTool() {
             decreaseBtn.classList.remove('disabled');
         }
 
-        // 更新剩余权重值和进度条
+        // 剩余权重值和进度条
         updateRemainingWeight(type);
     }
 
-    // 更新剩余权重值和进度条
+    // 剩余权重值和进度条
     function updateRemainingWeight(type) {
         const optionContainers = type === 'blue'
             ? elements.optionsContainer.querySelectorAll('.weight-container')
@@ -231,16 +231,16 @@ function initLotteryDecisionTool() {
         const remainingElement = type === 'blue' ? elements.blueRemaining : elements.redRemaining;
         remainingElement.textContent = remaining;
 
-        // 更新进度条 - 修改为从满开始减少
+        // 进度条
         const progressBar = type === 'blue'
             ? elements.blueWeightBar.querySelector('.weight-progress')
             : elements.redWeightBar.querySelector('.weight-progress');
 
-        // 原来是随着使用而增加，现在改为随着使用而减少
+        // 随着使用而减少
         const progressPercentage = (remaining / 10) * 100;
         progressBar.style.width = `${progressPercentage}%`;
 
-        // 更新所有增加按钮的状态
+        // 所有增加按钮的状态
         const allIncreaseButtons = type === 'blue'
             ? elements.optionsContainer.querySelectorAll('.weight-increase')
             : elements.redOptionsContainer.querySelectorAll('.weight-increase');

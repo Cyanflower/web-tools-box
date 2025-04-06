@@ -6,10 +6,10 @@
     "tool2Desc": "Convert between PNG and JPG format",
     "tool3": "PNG Cleaner",
     "tool3Desc": "Remove extra chunks from PNG files",
-    "tool4": "SillyTavern Preset Converter",
-    "tool4Desc": "Convert between Markdown and JSON formats for SillyTavern presets",
-    "tool5": "Lottery Decision Tool",
-    "tool5Desc": "Help two people make fair decisions",
+    "tool4": "SillyTavern Converter",
+    "tool4Desc": "Convert between multiple formats for SillyTavern presets and logs",
+    "tool5": "Lottery Decision",
+    "tool5Desc": "Help make fair decisions",
     "tool6": "Tool 6",
     "tool6Desc": "Coming Soon"
   },
@@ -20,10 +20,10 @@
     "tool2Desc": "PNG与JPG格式互相转换",
     "tool3": "PNG清理工具",
     "tool3Desc": "清理PNG文件中的额外数据块",
-    "tool4": "SillyTavern预设转换工具",
-    "tool4Desc": "在Markdown和JSON格式之间转换SillyTavern预设",
+    "tool4": "SillyTavern转换工具",
+    "tool4Desc": "在多种格式之间转换SillyTavern预设和log",
     "tool5": "抽签决策工具",
-    "tool5Desc": "帮助两人公平决策的随机抽签",
+    "tool5Desc": "帮助公平决策的随机抽签",
     "tool6": "工具 6",
     "tool6Desc": "开发中"
   }

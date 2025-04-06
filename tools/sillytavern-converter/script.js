@@ -439,45 +439,74 @@ function copyToClipboard(elementId) {
  * @param {string} fileType - 文件类型 ('json' 或 'md' 或 'txt')
  */
 function saveToFile(elementId, fileType) {
-    const element = document.getElementById(elementId);
-    const content = element.value;
-    
-    if (!content.trim()) {
-        alert(document.querySelector('[data-i18n="noContent"]').textContent);
-        return;
-    }
-    
-    // 使用源文件名作为基础（如果有的话）
-    let defaultName;
-    if (fileType === 'json' && mdSourceFilename) {
-        defaultName = mdSourceFilename + '.json';
-    } else if (fileType === 'md' && jsonSourceFilename) {
-        defaultName = jsonSourceFilename + '.md';
-    } else if (fileType === 'txt' && document.getElementById('jsonlFilename').textContent) {
-        defaultName = document.getElementById('jsonlFilename').textContent.replace(/\.[^/.]+$/, "") + '.txt';
-    } else {
-        defaultName = fileType === 'json' ? 'silly_tavern_preset.json' : 
-                      fileType === 'md' ? 'silly_tavern_preset.md' : 'chat_export.txt';
-    }
-    
-    const filename = prompt(document.querySelector('[data-i18n="enterFilename"]').textContent, defaultName);
-    
-    if (filename) {
-        const mimeType = fileType === 'json' ? 'application/json' : 
-                          fileType === 'md' ? 'text/markdown' : 'text/plain';
-        const blob = new Blob([content], { type: mimeType });
-        const url = URL.createObjectURL(blob);
+    try {
+        const element = document.getElementById(elementId);
+        if (!element) {
+            console.error('找不到元素:', elementId);
+            return;
+        }
         
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = filename;
-        document.body.appendChild(a);
-        a.click();
+        const content = element.value;
         
-        setTimeout(() => {
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
-        }, 0);
+        if (!content || !content.trim()) {
+            // 安全地获取文本内容
+            const noContentEl = document.querySelector('[data-i18n="noContent"]');
+            alert(noContentEl ? noContentEl.textContent : '没有可保存的内容');
+            return;
+        }
+        
+        // 使用源文件名作为基础（如果有的话）
+        let defaultName;
+        if (fileType === 'json' && mdSourceFilename) {
+            defaultName = mdSourceFilename + '.json';
+        } else if (fileType === 'md' && jsonSourceFilename) {
+            defaultName = jsonSourceFilename + '.md';
+        } else if (fileType === 'txt') {
+            const jsonlFilenameEl = document.getElementById('jsonlFilename');
+            if (jsonlFilenameEl && jsonlFilenameEl.textContent) {
+                defaultName = jsonlFilenameEl.textContent.replace(/\.[^/.]+$/, "") + '.txt';
+            } else {
+                defaultName = 'chat_export.txt';
+            }
+        } else {
+            defaultName = fileType === 'json' ? 'silly_tavern_preset.json' : 
+                          fileType === 'md' ? 'silly_tavern_preset.md' : 'chat_export.txt';
+        }
+        
+        // 安全地获取提示文本
+        const enterFilenameEl = document.querySelector('[data-i18n="enterFilename"]');
+        const promptText = enterFilenameEl ? enterFilenameEl.textContent : '请输入文件名';
+        
+        const filename = prompt(promptText, defaultName);
+        
+        if (filename) {
+            const mimeType = fileType === 'json' ? 'application/json' : 
+                              fileType === 'md' ? 'text/markdown' : 'text/plain';
+            const blob = new Blob([content], { type: mimeType });
+            const url = URL.createObjectURL(blob);
+            
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            a.style.display = 'none';
+            document.body.appendChild(a);
+            
+            try {
+                a.click();
+            } catch (e) {
+                console.error('点击下载链接时出错:', e);
+                // 尝试备用方法
+                window.open(url, '_blank');
+            }
+            
+            setTimeout(() => {
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+            }, 100);
+        }
+    } catch (error) {
+        console.error('保存文件时出错:', error);
+        alert('保存文件失败: ' + error.message);
     }
 }
 

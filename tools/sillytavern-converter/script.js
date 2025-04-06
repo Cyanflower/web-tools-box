@@ -579,6 +579,49 @@ function toggleExtendedDesc(type) {
 }
 
 /**
+ * 使用安全方法解析正则表达式字符串为RegExp对象
+ * @param {string} regexStr - 正则表达式字符串(已经是/pattern/flags格式)
+ * @returns {RegExp} - 生成的正则表达式对象
+ */
+function parseRegex(regexStr) {
+    if (!regexStr) return new RegExp('');
+    
+    // 确保输入是/pattern/flags格式
+    regexStr = formatRegex(regexStr);
+    
+    // 解析/pattern/flags格式
+    const regexMatch = /^\/(.*)\/([gimsuyd]*)$/.exec(regexStr);
+    
+    if (regexMatch) {
+        const [, pattern, flags] = regexMatch;
+        return new RegExp(pattern, flags);
+    } else {
+        // 理论上不应该到达这里，因为formatRegex已经处理了格式
+        return new RegExp(regexStr, 'gs');
+    }
+}
+
+/**
+ * 格式化正则表达式为统一的/pattern/flags格式
+ * @param {string} regexStr - 正则表达式字符串
+ * @returns {string} - 格式化后的正则表达式字符串
+ */
+function formatRegex(regexStr) {
+    if (!regexStr) return "";
+    
+    // 检查是否已经是/pattern/flags格式
+    const regexMatch = /^\/(.*)\/([gimsuyd]*)$/.exec(regexStr);
+    
+    if (regexMatch) {
+        // 已经是/pattern/flags格式，直接返回
+        return regexStr;
+    } else {
+        // 纯pattern格式，添加/和/gs标志
+        return `/${regexStr}/gs`;
+    }
+}
+
+/**
  * 从JSONL文件转换为TXT文本对话格式
  * @param {string} jsonlContent - JSONL文件内容
  * @param {string} prefixMode - 前缀模式（'name', 'human-assistant', 'user-model', 'none'）
@@ -613,20 +656,8 @@ function convertJsonlToTxtFormat(jsonlContent, prefixMode = 'name') {
                             if (shouldApply && !rule.disabled) {
                                 try {
                                     let regexStr = rule.findRegex;
-                                    let regex;
-                                    
-                                    // 正确处理用户输入的正则表达式格式
                                     if (typeof regexStr === 'string') {
-                                        if (regexStr.startsWith('/') && regexStr.lastIndexOf('/') > 0) {
-                                            // 处理 /pattern/flags 格式
-                                            const lastSlashIndex = regexStr.lastIndexOf('/');
-                                            const pattern = regexStr.substring(1, lastSlashIndex);
-                                            const flags = regexStr.substring(lastSlashIndex + 1);
-                                            regex = new RegExp(pattern, flags);
-                                        } else {
-                                            // 处理直接的pattern字符串，默认添加gs标志
-                                            regex = new RegExp(regexStr, 'gs');
-                                        }
+                                        const regex = parseRegex(regexStr);
                                         
                                         // 执行替换
                                         mesContent = mesContent.replace(regex, rule.replaceString || '');
@@ -722,7 +753,7 @@ function addDefaultRegex() {
     regexRules.push({
         id: generateUUID(),
         scriptName: "强制移除思维链",
-        findRegex: "(.*?<\\/think(ing)?>)(\\n)?|((.*?)<theatre>(\\n)?)",
+        findRegex: "/(.*?<\\/think(ing)?>(\\n)?)|((.*?)<theatre>(\\n)?)/gsi",
         replaceString: "",
         placement: [],
         disabled: false
@@ -731,7 +762,7 @@ function addDefaultRegex() {
     regexRules.push({
         id: generateUUID(),
         scriptName: "移除免责声明和标签",
-        findRegex: "(<disclaimer>.*?<\\/disclaimer>)|(<!-- State(.*?)d(.*?) -->(\\n)?)|(<!-- consider: (.*?) -->(\\n)?)|(<!-- sequential characters behaviors deductions: (.*?) -->(\\n)?)|((\\n)?<(\\/)?content>(\\n)?)",
+        findRegex: "/(<disclaimer>.*?<\\/disclaimer>)|(<!-- State(.*?)d(.*?) -->(\\n)?)|(<!-- consider: (.*?) -->(\\n)?)|(<!-- sequential characters behaviors deductions: (.*?) -->(\\n)?)|((\\n)?<(\\/)?content>(\\n)?)/gs",
         replaceString: "",
         placement: [],
         disabled: false
@@ -740,7 +771,7 @@ function addDefaultRegex() {
     regexRules.push({
         id: generateUUID(),
         scriptName: "移除摘要总结",
-        findRegex: "(<details><summary>\\s*(摘要|总结)?<\\/summary>.*?<\\/details>)|(<This_round_events>.*?<\\/This_round_events>)|(<[Aa]bstract>.*?<\\/[Aa]bstract>)|(<tableEdit>.*?<\\/tableEdit>)",
+        findRegex: "/(<details><summary>\\s*(摘要|总结)?<\\/summary>.*?<\\/details>)|(<This_round_events>.*?<\\/This_round_events>)|(<[Aa]bstract>.*?<\\/[Aa]bstract>)|(<tableEdit>.*?<\\/tableEdit>)/gs",
         replaceString: "",
         placement: [],
         disabled: false
@@ -790,33 +821,6 @@ function addNewRegex() {
 }
 
 /**
- * 格式化正则表达式显示
- * @param {string} regexStr - 正则表达式字符串
- * @returns {string} - 格式化后的正则表达式
- */
-function formatRegexDisplay(regexStr) {
-    if (!regexStr) return "";
-    
-    // 如果已经是/pattern/flags格式，则直接返回
-    if (regexStr.startsWith('/') && regexStr.lastIndexOf('/') > 0 && 
-        regexStr.lastIndexOf('/') < regexStr.length - 1) {
-        return regexStr;
-    }
-    
-    // 否则添加/和/gs标志
-    return `/${regexStr}/gs`;
-}
-
-/**
- * 从显示格式解析正则表达式
- * @param {string} displayStr - 显示格式的正则表达式
- * @returns {string} - 存储格式的正则表达式
- */
-function parseRegexFromDisplay(displayStr) {
-    return displayStr;
-}
-
-/**
  * 渲染正则表达式规则列表
  */
 function renderRegexRules() {
@@ -863,9 +867,9 @@ function renderRegexRules() {
         // 创建可编辑的文本域，并显示完整的/pattern/flags格式
         const regexInput = document.createElement('textarea');
         regexInput.className = 'regex-input';
-        regexInput.value = formatRegexDisplay(rule.findRegex);
+        regexInput.value = formatRegex(rule.findRegex);
         regexInput.placeholder = '例如: /pattern/flags 或直接输入pattern';
-        regexInput.onchange = (e) => updateRegexRule(rule.id, 'findRegex', parseRegexFromDisplay(e.target.value));
+        regexInput.onchange = (e) => updateRegexRule(rule.id, 'findRegex', formatRegex(e.target.value));
         
         regexField.appendChild(regexLabel);
         regexField.appendChild(regexInput);
@@ -1121,11 +1125,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         
                         // 处理不同格式的正则表达式
                         if (typeof regexStr === 'string') {
-                            // 如果不是 /pattern/flags 格式，转换为此格式
-                            if (!(regexStr.startsWith('/') && regexStr.lastIndexOf('/') > 0 && regexStr.lastIndexOf('/') < regexStr.length - 1)) {
-                                // 默认添加 gs 标志以支持全局和多行匹配
-                                regexStr = '/' + regexStr + '/gs';
-                            }
+                            regexStr = formatRegex(regexStr);
                         }
                         
                         const rule = {
@@ -1145,11 +1145,7 @@ document.addEventListener('DOMContentLoaded', function() {
                                 
                                 // 处理不同格式的正则表达式
                                 if (typeof regexStr === 'string') {
-                                    // 如果不是 /pattern/flags 格式，转换为此格式
-                                    if (!(regexStr.startsWith('/') && regexStr.lastIndexOf('/') > 0 && regexStr.lastIndexOf('/') < regexStr.length - 1)) {
-                                        // 默认添加 gs 标志以支持全局和多行匹配
-                                        regexStr = '/' + regexStr + '/gs';
-                                    }
+                                    regexStr = formatRegex(regexStr);
                                 }
                                 
                                 const rule = {

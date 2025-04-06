@@ -28,8 +28,8 @@
     <div class="container">
         <header>
             <div class="logo-container">
-                <h1 class="site-title" data-i18n="stPresetConverter">SillyTavern预设转换工具</h1>
-                <p class="site-subtitle" data-i18n="stPresetConverterDesc">在Markdown和JSON格式之间转换SillyTavern预设</p>
+                <h1 class="site-title" data-i18n="stPresetConverter">SillyTavern转换工具</h1>
+                <p class="site-subtitle" data-i18n="stPresetConverterDesc">这个工具可以帮助你在多种格式之间转换SillyTavern预设和log，让预设编辑和对话导出变得更加简单</p>
             </div>
             <div class="settings">
                 <div class="theme-toggle">
@@ -72,18 +72,18 @@
             <div class="tool-content">
                 <div class="tool-header">
                     <div class="tool-icon"><i class="fas fa-exchange-alt"></i></div>
-                    <h2 data-i18n="stPresetConverter">SillyTavern预设转换工具</h2>
+                    <h2 data-i18n="stPresetConverter">SillyTavern转换工具</h2>
                 </div>
                 <p class="tool-description" data-i18n="stPresetConverterLongDesc">
                     这个工具可以帮助你在多种格式之间转换SillyTavern预设和log，让预设编辑和对话导出变得更加简单。
                 </p>
                 
                 <div class="extended-description">
-                    <div class="description-toggle" onclick="toggleExtendedDesc()">
+                    <div class="description-toggle preset-guide" onclick="toggleExtendedDesc('preset')">
                         <i class="fas fa-chevron-down"></i>
-                        <span data-i18n="showDetailedGuide">展示详细使用指南</span>
+                        <span data-i18n="showDetailedGuide">展开预设相关使用指南</span>
                     </div>
-                    <div class="extended-description-content" id="extendedDescContent">
+                    <div class="extended-description-content" id="presetGuideContent">
                         <div class="guide-section">
                             <h3 data-i18n="vsCodeSetupTitle">预设相关 VS Code 配置指南</h3>
                             <p data-i18n="vsCodeSetupDesc">本工具旨在方便用户使用外部编辑器(如VS Code)编写Silly Tavern预设。请按照以下步骤配置您的VS Code环境：</p>
@@ -181,12 +181,60 @@
                             </div>
                         </div>
                     </div>
+                    
+                    <div class="description-toggle log-guide" onclick="toggleExtendedDesc('log')">
+                        <i class="fas fa-chevron-down"></i>
+                        <span data-i18n="showLogGuide">展开LOG相关使用指南</span>
+                    </div>
+                    <div class="extended-description-content" id="logGuideContent">
+                        <div class="guide-section">
+                            <h3>对话LOG相关使用指南</h3>
+                            
+                            <div class="guide-step">
+                                <h4>找到对话LOG</h4>
+                                <ul>
+                                    <li><strong>方案1：</strong>SillyTavern\data\default-user\chats下直接找到文件</li>
+                                    <li><strong>方案2：</strong>从前端导出：
+                                        <ol>
+                                            <li>点击酒馆前端底部对话窗左侧的三个横线图标按钮</li>
+                                            <li>点击管理聊天文件按钮</li>
+                                            <li>每个文件右侧第一个按钮"导出JSONL聊天文件"</li>
+                                        </ol>
+                                    </li>
+                                </ul>
+                            </div>
+                            
+                            <div class="guide-step">
+                                <h4>使用方法</h4>
+                                <p>上传文件或复制内容粘贴后点击转换文本</p>
+                            </div>
+                            
+                            <div class="guide-step">
+                                <h4>正则表达式处理说明</h4>
+                                <p>可以使用正则表达式处理对话内容，支持以下两种格式：</p>
+                                <ul>
+                                    <li><strong>/pattern/flags</strong>：完整正则表达式格式，flag可指定标志如g（全局）、s（单行）等</li>
+                                    <li><strong>pattern</strong>：直接输入模式，系统会自动添加gs标志</li>
+                                </ul>
+                                <p>常用特殊字符：</p>
+                                <ul>
+                                    <li>\n - 换行符</li>
+                                    <li>\t - 制表符</li>
+                                    <li>\s - 空格字符</li>
+                                    <li>\d - 数字</li>
+                                    <li>\w - 字母数字字符</li>
+                                    <li>. - 任意字符（使用.匹配所有字符包括换行需要s标志）</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
                 </div>
                 
                 <div class="converter-container">
                     <div class="tabs">
-                        <div class="tab active" onclick="showTab('md-to-json')" data-i18n="mdToJson">MD转JSON</div>
-                        <div class="tab" onclick="showTab('json-to-md')" data-i18n="jsonToMd">JSON转MD</div>
+                        <div class="tab" onclick="showTab('jsonl-to-txt')" data-i18n="jsonlToTxt">对话LOG JSONL转TXT</div>
+                        <div class="tab" onclick="showTab('md-to-json')" data-i18n="mdToJson">预设MD转JSON</div>
+                        <div class="tab active" onclick="showTab('json-to-md')" data-i18n="jsonToMd">预设JSON转MD</div>
                     </div>
                     
                     <div id="md-to-json" class="tab-content active">
@@ -195,12 +243,12 @@
                             <textarea id="inputAreaMd" class="converter-textarea" placeholder="" data-i18n-placeholder="pasteOrWrite"></textarea>
                             
                             <div class="actions">
-                                <button onclick="convertMdToJson()" class="converter-btn" data-i18n="convertToJson">转换为JSON</button>
                                 <div class="file-input-wrapper">
                                     <label class="file-input-label" data-i18n="selectMdFile">选择MD文件</label>
                                     <input type="file" id="fileInputMd" accept=".md">
                                     <span id="mdFilename" class="filename"></span>
                                 </div>
+                                <button onclick="convertMdToJson()" class="converter-btn" data-i18n="convertToJson">转换为JSON</button>
                             </div>
                         </div>
                         
@@ -220,12 +268,12 @@
                             <textarea id="inputAreaJson" class="converter-textarea" placeholder="" data-i18n-placeholder="pasteJsonContent"></textarea>
                             
                             <div class="actions">
-                                <button onclick="convertJsonToMd()" class="converter-btn" data-i18n="convertToMd">转换为MD</button>
                                 <div class="file-input-wrapper">
                                     <label class="file-input-label" data-i18n="selectJsonFile">选择JSON文件</label>
                                     <input type="file" id="fileInputJson" accept=".json">
                                     <span id="jsonFilename" class="filename"></span>
                                 </div>
+                                <button onclick="convertJsonToMd()" class="converter-btn" data-i18n="convertToMd">转换为MD</button>
                                 <div class="checkbox-container">
                                     <input type="checkbox" id="useFoldingFormat" checked>
                                     <label for="useFoldingFormat" data-i18n="useFoldingFormat">转换为折叠格式（添加@@@）</label>
@@ -239,6 +287,57 @@
                             <div class="actions">
                                 <button onclick="copyToClipboard('resultAreaMd')" class="converter-btn" data-i18n="copyToClipboard">复制到剪贴板</button>
                                 <button onclick="saveToFile('resultAreaMd', 'md')" class="converter-btn" data-i18n="saveAsMdFile">保存为MD文件</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div id="jsonl-to-txt" class="tab-content">
+                        <div class="section">
+                            <h3 data-i18n="inputJsonlContent">输入JSONL内容:</h3>
+                            <textarea id="inputAreaJsonl" class="converter-textarea" placeholder="" data-i18n-placeholder="pasteJsonlContent"></textarea>
+                            
+                            <div class="actions">
+                                <div class="file-input-wrapper">
+                                    <label class="file-input-label" data-i18n="selectJsonlFile">上传JSONL文件</label>
+                                    <input type="file" id="fileInputJsonl" accept=".jsonl">
+                                    <span id="jsonlFilename" class="filename"></span>
+                                </div>
+                                <button onclick="convertJsonlToTxt()" class="converter-btn" data-i18n="convertToTxt">转换文本</button>
+                                <div class="prefix-mode-container">
+                                    <label for="prefixMode" class="prefix-mode-label" data-i18n="prefixMode">前缀模式:</label>
+                                    <select id="prefixMode" class="prefix-mode-select">
+                                        <option value="name" selected data-i18n="prefixModeName">使用角色名称</option>
+                                        <option value="human-assistant" data-i18n="prefixModeHumanAssistant">Human和Assistant</option>
+                                        <option value="user-model" data-i18n="prefixModeUserModel">user和model</option>
+                                        <option value="none" data-i18n="prefixModeNone">无前缀</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="section">
+                            <h3 data-i18n="regexProcessing">正则表达式处理:</h3>
+                            <div class="regex-container">
+                                <div id="regexList" class="regex-list">
+                                    <!-- 正则表达式项将动态添加在这里 -->
+                                </div>
+                                <div class="regex-actions">
+                                    <button onclick="addNewRegex()" class="converter-btn" data-i18n="addNewRegex">新建正则</button>
+                                    <div class="file-input-wrapper">
+                                        <label class="file-input-label" data-i18n="importSTRegex">导入ST正则</label>
+                                        <input type="file" id="fileInputRegex" accept=".json">
+                                    </div>
+                                    <button onclick="addDefaultRegex()" class="converter-btn" data-i18n="resetDefault">重置默认</button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="section">
+                            <h3 data-i18n="conversionResult">转换结果:</h3>
+                            <textarea id="resultAreaTxt" class="converter-textarea" placeholder="" data-i18n-placeholder="txtResultWillShow" readonly></textarea>
+                            <div class="actions">
+                                <button onclick="copyToClipboard('resultAreaTxt')" class="converter-btn" data-i18n="copyToClipboard">复制到剪贴板</button>
+                                <button onclick="saveToFile('resultAreaTxt', 'txt')" class="converter-btn" data-i18n="saveAsTxtFile">保存为TXT文件</button>
                             </div>
                         </div>
                     </div>

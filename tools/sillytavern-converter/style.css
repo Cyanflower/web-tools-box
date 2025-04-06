@@ -50,6 +50,15 @@
     display: block;
 }
 
+/* 默认状态下，预设指南显示，LOG指南隐藏 */
+.description-toggle.preset-guide {
+    display: flex;
+}
+
+.description-toggle.log-guide {
+    display: none;
+}
+
 @keyframes slideDown {
     from { 
         opacity: 0;
@@ -201,6 +210,7 @@
     align-items: center;
     gap: 10px;
     margin: 20px 0;
+    justify-content: flex-start;
 }
 
 /* 文件输入包装 */
@@ -247,8 +257,8 @@
 }
 
 /* 按钮样式 */
-.converter-btn {
-    padding: 12px 20px;
+.converter-btn, .file-input-label {
+    padding: 10px 15px;
     background: var(--primary-color);
     color: white;
     border: none;
@@ -258,9 +268,17 @@
     transition: all 0.3s;
     font-weight: 500;
     box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    font-size: 14px;
+    width: 150px;
+    height: 40px;
+    text-align: center;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1.2;
 }
 
-.converter-btn:hover {
+.converter-btn:hover, .file-input-label:hover {
     background: var(--primary-hover);
     transform: translateY(-2px);
     box-shadow: 0 4px 8px rgba(0,0,0,0.15);
@@ -277,7 +295,8 @@
 }
 
 /* 复选框容器 */
-.checkbox-container {
+.checkbox-container,
+.prefix-mode-container {
     margin-left: 10px;
     display: flex;
     align-items: center;
@@ -285,6 +304,37 @@
 
 .checkbox-container input[type="checkbox"] {
     margin-right: 5px;
+}
+
+/* 前缀模式样式 */
+.prefix-mode-label {
+    margin-right: 10px;
+    font-weight: 500;
+}
+
+.prefix-mode-select {
+    padding: 8px 12px;
+    border-radius: 6px;
+    border: 1px solid var(--border-color);
+    background-color: var(--input-bg);
+    color: var(--text-color);
+    min-width: 170px;
+    cursor: pointer;
+    font-size: 14px;
+    height: 40px;
+    appearance: auto;
+}
+
+.prefix-mode-select:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 2px rgba(var(--primary-color-rgb), 0.2);
+}
+
+.prefix-mode-select option {
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    padding: 8px;
 }
 
 /* 响应式调整 */
@@ -311,8 +361,205 @@
         width: 100%;
     }
     
-    .checkbox-container {
+    .checkbox-container,
+    .prefix-mode-container {
         margin-left: 0;
         margin-top: 10px;
+        width: 100%;
+    }
+    
+    .prefix-mode-select {
+        flex-grow: 1;
+    }
+}
+
+/* 正则表达式处理样式 */
+.regex-container {
+    margin-bottom: 20px;
+}
+
+.regex-list {
+    margin-bottom: 10px;
+    max-height: 300px;
+    overflow-y: auto;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    padding: 10px;
+    background-color: var(--background-secondary);
+}
+
+.regex-item {
+    margin-bottom: 10px;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    background-color: var(--background-primary);
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.regex-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.regex-name {
+    font-weight: bold;
+    flex-grow: 1;
+}
+
+.regex-fields {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.regex-field {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.regex-field label {
+    min-width: 80px;
+    font-weight: bold;
+}
+
+.regex-field input[type="text"] {
+    flex-grow: 1;
+    padding: 8px;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    background-color: var(--input-bg);
+    color: var(--text-color);
+    font-family: inherit;
+    font-size: 0.9em;
+    width: 100%;
+}
+
+.regex-field input[type="text"]:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 2px rgba(var(--primary-color-rgb), 0.2);
+}
+
+.regex-actions {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.regex-target {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.checkbox-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.remove-regex-btn {
+    background-color: #e74c3c;
+    color: white;
+    border: none;
+    border-radius: 3px;
+    padding: 3px 8px;
+    cursor: pointer;
+}
+
+.remove-regex-btn:hover {
+    background-color: #c0392b;
+}
+
+@media (max-width: 768px) {
+    .regex-field {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .regex-field input[type="text"] {
+        width: 100%;
+    }
+    
+    .regex-actions {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+}
+
+.regex-display {
+    flex-grow: 1;
+    padding: 6px 8px;
+    border: 1px solid #ccc;
+    border-radius: 3px;
+    background-color: var(--background-secondary);
+    font-family: monospace;
+    white-space: pre-wrap;
+    word-break: break-all;
+    min-height: 1.5em;
+    max-height: 100px;
+    overflow-y: auto;
+    font-size: 0.9em;
+}
+
+/* 正则表达式文本域样式 */
+.regex-input {
+    flex-grow: 1;
+    min-height: 60px;
+    max-height: 150px;
+    width: 100%;
+    padding: 8px;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    background-color: var(--input-bg);
+    color: var(--text-color);
+    font-family: monospace;
+    font-size: 0.9em;
+    resize: vertical;
+    white-space: pre-wrap;
+    word-break: break-all;
+}
+
+.regex-input:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 2px rgba(var(--primary-color-rgb), 0.2);
+}
+
+/* 正则表达式帮助信息样式 */
+.regex-help {
+    margin: 4px 0 8px 80px;
+    font-size: 0.85em;
+    color: var(--text-secondary);
+}
+
+.regex-help-text {
+    font-style: italic;
+}
+
+@media (max-width: 768px) {
+    .regex-field {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .regex-field input[type="text"] {
+        width: 100%;
+    }
+    
+    .regex-help {
+        margin-left: 0;
+    }
+    
+    .regex-actions {
+        flex-direction: column;
+        align-items: flex-start;
     }
 } 

@@ -749,7 +749,7 @@ function addDefaultRegex() {
     regexRules.push({
         id: generateUUID(),
         scriptName: "移除状态栏",
-        findRegex: "/(<(status(blocks?)?>.*?<(\\/status(blocks?)?)>)/gsi",
+        findRegex: "/<status(blocks?)?>.*?<\\/status(blocks?)?>/gsi",
         replaceString: "",
         placement: [],
         disabled: false

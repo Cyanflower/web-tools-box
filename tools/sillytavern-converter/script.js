@@ -390,7 +390,7 @@ function convertMdToJson() {
     
     const mdContent = inputArea.value;
     if (!mdContent.trim()) {
-        alert(document.querySelector('[data-i18n="noMdContent"]').textContent);
+        alert(LanguageManager.getText('noMdContent'));
         return;
     }
     
@@ -407,7 +407,7 @@ function convertJsonToMd() {
     
     const jsonContent = inputArea.value;
     if (!jsonContent.trim()) {
-        alert(document.querySelector('[data-i18n="noJsonContent"]').textContent);
+        alert(LanguageManager.getText('noJsonContent'));
         return;
     }
     
@@ -430,7 +430,7 @@ function copyToClipboard(elementId) {
     const element = document.getElementById(elementId);
     element.select();
     document.execCommand('copy');
-    alert(document.querySelector('[data-i18n="copied"]').textContent);
+    alert(LanguageManager.getText('copied'));
 }
 
 /**
@@ -449,9 +449,8 @@ function saveToFile(elementId, fileType) {
         const content = element.value;
         
         if (!content || !content.trim()) {
-            // 安全地获取文本内容
-            const noContentEl = document.querySelector('[data-i18n="noContent"]');
-            alert(noContentEl ? noContentEl.textContent : '没有可保存的内容');
+            const noContentText = LanguageManager.getText('noContent');
+            alert(noContentText);
             return;
         }
         
@@ -473,10 +472,7 @@ function saveToFile(elementId, fileType) {
                           fileType === 'md' ? 'silly_tavern_preset.md' : 'chat_export.txt';
         }
         
-        // 安全地获取提示文本
-        const enterFilenameEl = document.querySelector('[data-i18n="enterFilename"]');
-        const promptText = enterFilenameEl ? enterFilenameEl.textContent : '请输入文件名';
-        
+        const promptText = LanguageManager.getText('enterFilename');
         const filename = prompt(promptText, defaultName);
         
         if (filename) {
@@ -505,7 +501,6 @@ function saveToFile(elementId, fileType) {
             }, 100);
         }
     } catch (error) {
-        console.error('保存文件时出错:', error);
         alert('保存文件失败: ' + error.message);
     }
 }
@@ -763,7 +758,7 @@ function convertJsonlToTxt() {
     
     const jsonlContent = inputArea.value;
     if (!jsonlContent.trim()) {
-        alert(document.querySelector('[data-i18n="noJsonlContent"]').textContent);
+        alert(LanguageManager.getText('noJsonlContent'));
         return;
     }
     

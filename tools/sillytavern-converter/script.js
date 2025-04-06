@@ -739,8 +739,8 @@ function addDefaultRegex() {
     
     regexRules.push({
         id: generateUUID(),
-        scriptName: "移除状态栏",
-        findRegex: "(<details><summary>\\s*(摘要|总结)?<\\/summary>.*?<\\/details>)|(<This_round_events>.*?<\\/This_round_events>)|(<[Aa]bstract>.*?<\\/[Aa]bstract>)",
+        scriptName: "移除摘要总结",
+        findRegex: "(<details><summary>\\s*(摘要|总结)?<\\/summary>.*?<\\/details>)|(<This_round_events>.*?<\\/This_round_events>)|(<[Aa]bstract>.*?<\\/[Aa]bstract>)|(<tableEdit>.*?<\\/tableEdit>)",
         replaceString: "",
         placement: [],
         disabled: false
@@ -748,11 +748,11 @@ function addDefaultRegex() {
     
     regexRules.push({
         id: generateUUID(),
-        scriptName: "移除代码块",
-        findRegex: "```[\\s\\S]*?```",
+        scriptName: "移除状态栏",
+        findRegex: "/(<(status(blocks?)?>.*?<(\\/status(blocks?)?)>)/gsi",
         replaceString: "",
         placement: [],
-        disabled: true
+        disabled: false
     });
     
     // 更新UI

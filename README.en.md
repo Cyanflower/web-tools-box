@@ -34,6 +34,8 @@ For large files or batch processing of multiple files, longer processing times m
 - **Image Format Converter**: When converting PNG to JPG, transparency will be lost; you can set a background color
 - **PNG Cleaner**: Basic mode is suitable for most users, while advanced mode allows for finer control
 - **Markdown Image Extractor**: Supports base64 encoded images in standard Markdown syntax
+- **SillyTavern Converter**: This tool helps you convert between multiple formats for SillyTavern presets and logs
+- **Lottery Decision**: Fair decision making with dual-weighted options
 - **Test**: Can be tested locally with commands: `live-server --mount=/web-tools-box:. --port=xxxx`
 
 ## Compatibility

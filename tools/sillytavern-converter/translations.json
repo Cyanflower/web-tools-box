@@ -2,7 +2,7 @@
   "en": {
     "stPresetConverter": "SillyTavern Converter",
     "stPresetConverterDesc": "Convert between multiple formats for SillyTavern presets and logs",
-    "stPresetConverterLongDesc": "This tool helps you convert between multiple formats for SillyTavern presets and logs, making preset editing and log export much easier with external editors.",
+    "stPresetConverterLongDesc": "This tool helps you convert between multiple formats for SillyTavern presets and logs, making log export and preset editing much easier with external editors.",
     "showDetailedGuide": "Show Preset Related Detailed Usage Guide",
     "showLogGuide": "Show LOG Related Usage Guide",
     "vsCodeSetupTitle": "VS Code Setup Guide",
@@ -67,8 +67,8 @@
   },
   "zh": {
     "stPresetConverter": "SillyTavern转换工具",
-    "stPresetConverterDesc": "在多种格式之间转换SillyTavern预设和log",
-    "stPresetConverterLongDesc": "这个工具可以帮助你在多种格式之间转换SillyTavern预设和log，让你能够导出对话和使用外部编辑器编辑预设。",
+    "stPresetConverterDesc": "在多种格式之间转换SillyTavern预设和Log文件",
+    "stPresetConverterLongDesc": "这个工具可以帮助你在多种格式之间转换SillyTavern预设和Log，让你能够导出对话和使用外部编辑器编辑预设。",
     "showDetailedGuide": "显示预设相关使用指南",
     "showLogGuide": "显示LOG相关使用指南",
     "vsCodeSetupTitle": "VS Code 配置指南",

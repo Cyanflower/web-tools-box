@@ -19,7 +19,7 @@
     "tool2": "图片格式转换器",
     "tool2Desc": "PNG与JPG格式互相转换",
     "tool3": "PNG清理工具",
-    "tool3Desc": "清理PNG文件中的额外数据块",
+    "tool3Desc": "清理PNG文件中的额外数据块, 如Comfyui的工作流数据",
     "tool4": "SillyTavern转换工具",
     "tool4Desc": "在多种格式之间转换SillyTavern预设和log",
     "tool5": "抽签决策工具",

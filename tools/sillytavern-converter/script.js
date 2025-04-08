@@ -182,24 +182,22 @@ function convertMdToSillyTavernPreset(mdContent) {
         
         // 设置内容 (跳过头部行)
         const contentLines = lines.slice(1);
-        // 确保内容末尾的换行符被保留，同时去除开头的空白
-        let content = contentLines.join('\n');
-        
-        // 去除开头的空白，保留内容
-        const trimStartContent = content.trimStart();
-        
-        // 只在非空内容且不以换行符结尾时添加换行符，不在原内容已有换行符时额外添加
-        if (trimStartContent.length > 0 && !trimStartContent.endsWith('\n')) {
-            content = trimStartContent + '\n';
-        } else {
-            content = trimStartContent;
+        // 原始连接的内容
+        const rawJoinedContent = contentLines.join('\n');
+
+        // 处理内容：调整结尾换行符，保留开头空白
+        let finalContent = rawJoinedContent; // <<< 不再使用 trimStart()，保留开头空白
+        // 如果移除 @@@ 后内容以换行符结尾，则移除末尾的一个换行符
+        if (finalContent.endsWith('\n')) {
+            finalContent = finalContent.slice(0, -1);
         }
+        // 如果 finalContent 为空字符串，则保持为空
         
         // 初始化基本参数
         const prompt = {
             name: name,
             role: role,
-            content: content,
+            content: finalContent, // <<< 使用调整后的 finalContent
             injection_position: 0,
             injection_depth: 4,
             forbid_overrides: false
@@ -214,7 +212,7 @@ function convertMdToSillyTavernPreset(mdContent) {
                     identifier: `${index + 1}`,
                     name: name,
                     role: role,
-                    content: content,
+                    content: finalContent, // <<< 确保这里也使用 finalContent
                     injection_position: 1,
                     injection_depth: parseInt(str),
                     forbid_overrides: false,
@@ -261,7 +259,7 @@ function convertMdToSillyTavernPreset(mdContent) {
                 identifier: `${index + 1}`,
                 name: name,
                 role: role,
-                content: content,
+                content: finalContent, // <<< 确保这里也使用 finalContent
                 injection_position: 0,
                 injection_depth: 4,
                 forbid_overrides: false,

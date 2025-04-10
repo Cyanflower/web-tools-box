@@ -5,12 +5,6 @@
 const CacheManager = (function() {
     // 缓存配置
     const CACHE_CONFIG = {
-        TOOL_AVAILABILITY: {
-            key: 'tool_availability_cache',
-            version: '1.0',
-            expiry: 24 * 60 * 60 * 1000, // 24小时
-            description: '工具可用性检查结果'
-        },
         THEME_SETTINGS: {
             key: 'theme_settings',
             version: '1.0',

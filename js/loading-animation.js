@@ -12,6 +12,7 @@ const LoadingManager = (function() {
         STYLES: 15
     };
     const REQUEST_TIMEOUT = 3000; // 请求超时时间（毫秒）
+    const AVAILABILITY_CHECK_INTERVAL = 60 * 60 * 1000; // 检查间隔时间（1小时）
     
     // 状态变量
     let startTime = Date.now();
@@ -195,33 +196,6 @@ const LoadingManager = (function() {
     }
     
     /**
-     * 从localStorage直接读取工具可用性缓存
-     * 用于在CacheManager未完全初始化时的紧急处理
-     * @returns {Object|null} 缓存数据或null
-     */
-    function getToolAvailabilityDirectly() {
-        try {
-            const cacheKey = 'tool_availability_cache';
-            const cache = localStorage.getItem(cacheKey);
-            if (!cache) return null;
-            
-            const cacheData = JSON.parse(cache);
-            const { version, timestamp, data } = cacheData;
-            
-            // 检查版本和过期时间(24小时)
-            const expiry = 24 * 60 * 60 * 1000; // 24小时
-            if (version !== '1.0' || (Date.now() - timestamp > expiry)) {
-                return null;
-            }
-            
-            return data;
-        } catch (error) {
-            console.error('直接读取工具可用性缓存失败:', error);
-            return null;
-        }
-    }
-    
-    /**
      * 检查工具可用性
      * @returns {Promise<void>}
      */
@@ -243,40 +217,36 @@ const LoadingManager = (function() {
                 return;
             }
             
-            // 先尝试使用CacheManager获取缓存
-            let cachedData = null;
-            
-            // 确保CacheManager已初始化
-            if (window.CacheManager && typeof CacheManager.getCache === 'function') {
-                cachedData = CacheManager.getCache('TOOL_AVAILABILITY');
-            }
-            
-            // 如果CacheManager未能获取缓存，尝试直接从localStorage读取
-            if (!cachedData) {
-                cachedData = getToolAvailabilityDirectly();
-            }
-            
-            if (cachedData) {
-                console.log('使用缓存的工具可用性数据:', cachedData);
-                // 使用缓存数据更新UI
-                cards.forEach(card => {
-                    const onclickAttr = card.getAttribute('onclick') || '';
-                    const urlMatch = onclickAttr.match(/window\.location\.href=['"](.*?)['"]/);
-                    if (urlMatch && urlMatch[1]) {
-                        const toolUrl = urlMatch[1];
-                        if (!cachedData[toolUrl]) {
-                            disableToolCard(card);
+            // 检查是否在当前会话的检查间隔内
+            const lastCheckTime = sessionStorage.getItem('tool_availability_last_check');
+            if (lastCheckTime) {
+                const elapsedTime = Date.now() - parseInt(lastCheckTime, 10);
+                if (elapsedTime < AVAILABILITY_CHECK_INTERVAL) {
+                    console.log(`上次检查在${Math.round(elapsedTime / 60000)}分钟前，跳过此次检查`);
+                    
+                    // 读取会话存储中的可用性数据
+                    const availabilityData = JSON.parse(sessionStorage.getItem('tool_availability_data') || '{}');
+                    
+                    // 应用到UI
+                    cards.forEach(card => {
+                        const onclickAttr = card.getAttribute('onclick') || '';
+                        const urlMatch = onclickAttr.match(/window\.location\.href=['"](.*?)['"]/);
+                        if (urlMatch && urlMatch[1]) {
+                            const toolUrl = urlMatch[1];
+                            if (availabilityData[toolUrl] === false) {
+                                disableToolCard(card);
+                            }
                         }
-                    }
-                });
-                
-                // 标记脚本加载完成
-                setResourceLoaded('SCRIPTS');
-                toolAvailabilityCheckPending = false;
-                return;
+                    });
+                    
+                    setResourceLoaded('SCRIPTS');
+                    toolAvailabilityCheckPending = false;
+                    return;
+                }
             }
-
-            console.log('没有找到工具可用性缓存，进行实时检查');
+            
+            // 需要执行新的检查
+            console.log('执行新的工具可用性检查');
             
             // 收集所有唯一的工具URL
             const availabilityData = {};
@@ -329,22 +299,12 @@ const LoadingManager = (function() {
             
             console.log('所有URL检查完成，保存结果');
             
-            // 保存检查结果到localStorage(直接保存和通过CacheManager保存)
+            // 保存检查结果到sessionStorage
             try {
-                const cacheKey = 'tool_availability_cache';
-                const cache = {
-                    version: '1.0',
-                    timestamp: Date.now(),
-                    data: availabilityData
-                };
-                localStorage.setItem(cacheKey, JSON.stringify(cache));
-                
-                // 如果CacheManager可用，也通过它保存一份
-                if (window.CacheManager && typeof CacheManager.setCache === 'function') {
-                    CacheManager.setCache('TOOL_AVAILABILITY', availabilityData);
-                }
+                sessionStorage.setItem('tool_availability_last_check', Date.now().toString());
+                sessionStorage.setItem('tool_availability_data', JSON.stringify(availabilityData));
             } catch (error) {
-                console.error('保存工具可用性缓存失败:', error);
+                console.error('保存工具可用性数据到会话存储失败:', error);
             }
         } catch (err) {
             console.error('工具可用性检查过程中发生错误:', err);
@@ -389,7 +349,7 @@ const LoadingManager = (function() {
             // 在翻译加载完成后初始化工具可用性检查
             setTimeout(() => {
                 checkToolAvailability();
-            }, 100); // 添加小延迟确保CacheManager已初始化
+            }, 100); // 添加小延迟确保DOM已完全处理
         });
     }
     

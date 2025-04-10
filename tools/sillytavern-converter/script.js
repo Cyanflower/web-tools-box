@@ -3,10 +3,54 @@
  * 用于在Markdown格式和JSON格式之间转换SillyTavern预设
  */
 
+// 工具ID，用于缓存管理
+const TOOL_ID = 'sillytavern-converter';
+
 // 全局变量
 let mdSourceFilename = '';
 let jsonSourceFilename = '';
 let regexRules = []; // 存储正则表达式规则
+
+/**
+ * 保存当前设置到缓存
+ */
+function saveSettingsToCache() {
+    // 构建设置对象
+    const settings = {
+        regexRules: regexRules,
+        prefixMode: document.getElementById('prefixMode')?.value || 'name'
+    };
+    
+    // 保存到缓存
+    if (typeof CacheManager !== 'undefined') {
+        CacheManager.setToolSettings(TOOL_ID, settings);
+    }
+}
+
+/**
+ * 从缓存加载设置
+ */
+function loadSettingsFromCache() {
+    if (typeof CacheManager === 'undefined') return;
+    
+    // 从缓存加载设置
+    const settings = CacheManager.getToolSettings(TOOL_ID);
+    if (!settings) return;
+    
+    // 加载正则规则
+    if (settings.regexRules && Array.isArray(settings.regexRules)) {
+        regexRules = settings.regexRules;
+        renderRegexRules();
+    }
+    
+    // 加载前缀模式
+    if (settings.prefixMode) {
+        const prefixModeSelect = document.getElementById('prefixMode');
+        if (prefixModeSelect) {
+            prefixModeSelect.value = settings.prefixMode;
+        }
+    }
+}
 
 /**
  * 显示选定的标签页
@@ -810,6 +854,9 @@ function addDefaultRegex() {
     
     // 更新UI
     renderRegexRules();
+    
+    // 保存到缓存
+    saveSettingsToCache();
 }
 
 /**
@@ -840,6 +887,9 @@ function addNewRegex() {
         const regexList = document.getElementById('regexList');
         regexList.scrollTop = regexList.scrollHeight;
     }, 100);
+    
+    // 保存到缓存
+    saveSettingsToCache();
 }
 
 /**
@@ -1048,6 +1098,9 @@ function updateRegexRule(id, field, value) {
     const ruleIndex = regexRules.findIndex(rule => rule.id === id);
     if (ruleIndex !== -1) {
         regexRules[ruleIndex][field] = value;
+        
+        // 保存到缓存
+        saveSettingsToCache();
     }
 }
 
@@ -1058,6 +1111,9 @@ function updateRegexRule(id, field, value) {
 function removeRegex(id) {
     regexRules = regexRules.filter(rule => rule.id !== id);
     renderRegexRules();
+    
+    // 保存到缓存
+    saveSettingsToCache();
 }
 
 /**
@@ -1193,6 +1249,12 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
     
+    // 添加前缀模式变更事件监听
+    document.getElementById('prefixMode').addEventListener('change', function() {
+        // 保存到缓存
+        saveSettingsToCache();
+    });
+    
     // 初始化多语言占位符
     document.querySelectorAll('[data-i18n-placeholder]').forEach(element => {
         const key = element.getAttribute('data-i18n-placeholder');
@@ -1241,6 +1303,14 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
     
-    // 初始化默认正则表达式
-    addDefaultRegex();
+    // 从缓存加载设置
+    loadSettingsFromCache();
+    
+    // 如果没有正则规则（可能是首次访问），则添加默认规则
+    if (regexRules.length === 0) {
+        addDefaultRegex();
+    } else {
+        // 否则渲染已加载的规则
+        renderRegexRules();
+    }
 }); 

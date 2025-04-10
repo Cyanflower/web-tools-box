@@ -7,19 +7,19 @@ const CacheManager = (function() {
     const CACHE_CONFIG = {
         THEME_SETTINGS: {
             key: 'theme_settings',
-            version: '1.0',
+            version: '1.2',
             expiry: null, // 永久存储
             description: '主题设置'
         },
         LANGUAGE_SETTINGS: {
             key: 'language_settings',
-            version: '1.0',
+            version: '1.2',
             expiry: null, // 永久存储
             description: '语言设置'
         },
         TOOL_SETTINGS: {
             key: 'tool_settings',
-            version: '1.0',
+            version: '1.2',
             expiry: null, // 永久存储
             description: '工具设置'
         }

@@ -50,6 +50,95 @@
     display: block;
 }
 
+/* 预设配置容器样式 */
+.preset-config-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(450px, 1fr));
+    gap: 20px;
+    margin-top: 10px;
+}
+
+.preset-config-group {
+    background-color: var(--bg-color);
+    border-radius: var(--border-radius);
+    padding: 15px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+}
+
+.preset-config-group h4 {
+    margin-top: 0;
+    margin-bottom: 15px;
+    color: var(--primary-color);
+    font-size: 1.1em;
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 8px;
+}
+
+.config-item {
+    margin-bottom: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.config-item label {
+    font-weight: 500;
+    font-size: 0.95em;
+    color: var(--text-color);
+}
+
+.config-item input[type="text"],
+.config-item input[type="number"],
+.config-item select {
+    padding: 8px 10px;
+    border-radius: 6px;
+    border: 1px solid var(--border-color);
+    background-color: var(--input-bg);
+    color: var(--text-color);
+    width: 100%;
+    font-size: 0.95em;
+    transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+.config-item textarea {
+    padding: 8px 10px;
+    border-radius: 6px;
+    border: 1px solid var(--border-color);
+    background-color: var(--input-bg);
+    color: var(--text-color);
+    width: 100%;
+    min-height: 60px;
+    font-family: 'Consolas', monospace;
+    font-size: 0.9em;
+    resize: vertical;
+}
+
+.config-item input:focus,
+.config-item select:focus,
+.config-item textarea:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(var(--primary-color-rgb), 0.2);
+}
+
+.config-item.checkbox-item {
+    flex-direction: row;
+    align-items: center;
+    gap: 8px;
+}
+
+.config-item.checkbox-item input[type="checkbox"] {
+    margin: 0;
+    width: 16px;
+    height: 16px;
+}
+
+@media (max-width: 768px) {
+    .preset-config-container {
+        grid-template-columns: 1fr;
+    }
+}
+
 /* 默认状态下，预设指南显示，LOG指南隐藏 */
 .description-toggle.preset-guide {
     display: flex;

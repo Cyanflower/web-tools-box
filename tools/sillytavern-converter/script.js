@@ -50,6 +50,9 @@ function loadSettingsFromCache() {
             prefixModeSelect.value = settings.prefixMode;
         }
     }
+    
+    // 加载预设配置项到表单
+    loadPresetConfigFromCache();
 }
 
 /**
@@ -189,6 +192,9 @@ function convertMdToSillyTavernPreset(mdContent) {
         "main", "enhanceDefinitions", "jailbreak", "nsfw"
     ];
     
+    // 用于跟踪已使用的特殊标识符
+    const usedSpecialIdentifiers = new Set();
+    
     // 标准化换行符
     mdContent = mdContent.replace(/\r\n/g, '\n');
     
@@ -267,34 +273,56 @@ function convertMdToSillyTavernPreset(mdContent) {
                 Object.keys(prompt).forEach(key => delete prompt[key]);
                 Object.assign(prompt, numPrompt);
             } else {  // 如果STR是字符串
-                prompt.identifier = str;
-                
-                // 处理特殊标识符
-                if (markerIdentifiers.includes(str)) {
-                    // 纯marker类型，只保留4个基本属性
-                    // 创建一个新的对象，只包含必要的4个属性
-                    const markerPrompt = {
-                        identifier: str,
+                // 检查是否为特殊标识符，以及是否已被使用
+                if (specialIdentifiers.includes(str) && !usedSpecialIdentifiers.has(str)) {
+                    // 标记此特殊标识符已被使用
+                    usedSpecialIdentifiers.add(str);
+                    
+                    prompt.identifier = str;
+                    
+                    // 处理特殊标识符
+                    if (markerIdentifiers.includes(str)) {
+                        // 纯marker类型，只保留4个基本属性
+                        // 创建一个新的对象，只包含必要的4个属性
+                        const markerPrompt = {
+                            identifier: str,
+                            name: name,
+                            system_prompt: true,
+                            marker: true
+                        };
+                        // 用新对象替换原来的prompt
+                        Object.keys(prompt).forEach(key => delete prompt[key]);
+                        Object.assign(prompt, markerPrompt);
+                    } else if (systemNonMarkerIdentifiers.includes(str)) {
+                        // 系统提示词但不是marker
+                        prompt.marker = false;
+                        prompt.system_prompt = true;
+                        
+                        // 特殊处理main的forbid_overrides
+                        if (str === "main") {
+                            prompt.forbid_overrides = true;
+                        }
+                    } else {
+                        // 其他标识符（如UUID或其他自定义标识符）
+                        prompt.marker = false;
+                        prompt.system_prompt = false;
+                    }
+                } else {
+                    // 如果是已使用过的特殊标识符或非特殊标识符，使用数字标识符
+                    const defaultPrompt = {
+                        identifier: `${index + 1}`,
                         name: name,
-                        system_prompt: true,
-                        marker: true
+                        role: role,
+                        content: finalContent,
+                        injection_position: 0,
+                        injection_depth: 4,
+                        forbid_overrides: false,
+                        marker: false,
+                        system_prompt: false
                     };
                     // 用新对象替换原来的prompt
                     Object.keys(prompt).forEach(key => delete prompt[key]);
-                    Object.assign(prompt, markerPrompt);
-                } else if (systemNonMarkerIdentifiers.includes(str)) {
-                    // 系统提示词但不是marker
-                    prompt.marker = false;
-                    prompt.system_prompt = true;
-                    
-                    // 特殊处理main的forbid_overrides
-                    if (str === "main") {
-                        prompt.forbid_overrides = true;
-                    }
-                } else {
-                    // 其他标识符（如UUID或其他自定义标识符）
-                    prompt.marker = false;
-                    prompt.system_prompt = false;
+                    Object.assign(prompt, defaultPrompt);
                 }
             }
         } else {
@@ -424,6 +452,101 @@ function convertJsonToMarkdownFormat(jsonContent) {
 }
 
 /**
+ * 从JSON中提取核心配置项并保存到缓存
+ * @param {Object} jsonObj - 解析后的JSON对象
+ */
+function savePresetConfigToCache(jsonObj) {
+    // 核心配置项列表
+    const coreConfigKeys = [
+        'chat_completion_source', 'custom_prompt_post_processing', 
+        'temperature', 'frequency_penalty', 'presence_penalty', 
+        'top_p', 'top_k', 'top_a', 'min_p', 'repetition_penalty', 
+        'openai_max_context', 'openai_max_tokens', 'wrap_in_quotes', 
+        'names_behavior', 'send_if_empty', 'impersonation_prompt', 
+        'new_chat_prompt', 'new_group_chat_prompt', 'new_example_chat_prompt', 
+        'continue_nudge_prompt', 'max_context_unlocked', 'wi_format', 
+        'scenario_format', 'personality_format', 'group_nudge_prompt', 
+        'stream_openai', 'show_external_models', 'assistant_prefill', 
+        'assistant_impersonation', 'claude_use_sysprompt', 'use_makersuite_sysprompt', 
+        'use_alt_scale', 'squash_system_messages', 'image_inlining', 
+        'inline_image_quality', 'bypass_status_check', 'continue_prefill', 
+        'continue_postfix', 'function_calling', 'show_thoughts', 'reasoning_effort'
+    ];
+    
+    // 提取核心配置项
+    const coreConfig = {};
+    coreConfigKeys.forEach(key => {
+        if (key in jsonObj) {
+            coreConfig[key] = jsonObj[key];
+        }
+    });
+    
+    // 保存到缓存
+    if (typeof CacheManager !== 'undefined') {
+        const settings = CacheManager.getToolSettings(TOOL_ID) || {};
+        settings.presetConfig = coreConfig;
+        CacheManager.setToolSettings(TOOL_ID, settings);
+    }
+}
+
+/**
+ * 从缓存加载核心配置项到表单
+ */
+function loadPresetConfigFromCache() {
+    if (typeof CacheManager === 'undefined') return;
+    
+    // 从缓存加载设置
+    const settings = CacheManager.getToolSettings(TOOL_ID);
+    if (!settings || !settings.presetConfig) return;
+    
+    const config = settings.presetConfig;
+    
+    // 将配置应用到表单
+    Object.keys(config).forEach(key => {
+        const element = document.getElementById(key);
+        if (element) {
+            if (element.type === 'checkbox') {
+                element.checked = config[key];
+            } else if (element.type === 'select-one') {
+                element.value = config[key];
+            } else {
+                element.value = config[key];
+            }
+        }
+    });
+}
+
+/**
+ * 从表单中获取核心配置参数
+ * @returns {Object} - 配置参数对象
+ */
+function getPresetConfigFromForm() {
+    const config = {};
+    
+    // 从表单中获取所有输入值
+    // 文本输入和选择框
+    document.querySelectorAll('#presetConfigContent input[type="text"], #presetConfigContent input[type="number"], #presetConfigContent select, #presetConfigContent textarea').forEach(input => {
+        if (input.id) {
+            // 数字字段需要转换为数字
+            if (input.type === 'number') {
+                config[input.id] = parseFloat(input.value);
+            } else {
+                config[input.id] = input.value;
+            }
+        }
+    });
+    
+    // 复选框
+    document.querySelectorAll('#presetConfigContent input[type="checkbox"]').forEach(checkbox => {
+        if (checkbox.id) {
+            config[checkbox.id] = checkbox.checked;
+        }
+    });
+    
+    return config;
+}
+
+/**
  * MD转JSON功能
  */
 function convertMdToJson() {
@@ -436,7 +559,24 @@ function convertMdToJson() {
         return;
     }
     
-    const jsonResult = convertMdToSillyTavernPreset(mdContent);
+    // 获取表单中的核心配置参数
+    const formConfig = getPresetConfigFromForm();
+    
+    // 转换MD到JSON
+    let jsonResult = convertMdToSillyTavernPreset(mdContent);
+    
+    try {
+        // 将表单配置应用到转换结果
+        const jsonObj = JSON.parse(jsonResult);
+        Object.keys(formConfig).forEach(key => {
+            jsonObj[key] = formConfig[key];
+        });
+        jsonResult = JSON.stringify(jsonObj, null, 4);
+    } catch (e) {
+        console.error('应用预设配置失败:', e);
+        // 继续使用原始转换结果
+    }
+    
     resultArea.value = jsonResult;
 }
 
@@ -451,6 +591,18 @@ function convertJsonToMd() {
     if (!jsonContent.trim()) {
         alert(LanguageManager.getText('noJsonContent'));
         return;
+    }
+    
+    try {
+        // 保存核心配置到缓存
+        const jsonObj = JSON.parse(jsonContent);
+        savePresetConfigToCache(jsonObj);
+        
+        // 立即加载配置到UI
+        loadPresetConfigFromCache();
+    } catch (e) {
+        console.error('保存预设配置失败:', e);
+        // 继续执行转换，不中断流程
     }
     
     let mdResult = convertJsonToMarkdownFormat(jsonContent);
@@ -622,7 +774,7 @@ function convertFromRegionFolding(mdContent) {
 
 /**
  * 切换扩展说明区域的显示/隐藏状态
- * @param {string} type - 指南类型('preset'或'log')
+ * @param {string} type - 指南类型('preset'、'log'或'preset-config')
  */
 function toggleExtendedDesc(type) {
     let toggle, content;
@@ -630,6 +782,9 @@ function toggleExtendedDesc(type) {
     if (type === 'log') {
         toggle = document.querySelector('.description-toggle.log-guide');
         content = document.getElementById('logGuideContent');
+    } else if (type === 'preset-config') {
+        toggle = document.querySelector('.description-toggle[onclick="toggleExtendedDesc(\'preset-config\')"]');
+        content = document.getElementById('presetConfigContent');
     } else {
         toggle = document.querySelector('.description-toggle.preset-guide');
         content = document.getElementById('presetGuideContent');
@@ -1128,134 +1283,143 @@ function generateUUID() {
     });
 }
 
-// 添加事件监听器
+// 页面加载时执行
 document.addEventListener('DOMContentLoaded', function() {
-    // 默认显示JSONL转TXT选项卡
-    showTab('jsonl-to-txt');
+    // 加载设置
+    loadSettingsFromCache();
     
-    // 文件输入变更事件处理
-    document.getElementById('fileInputMd').addEventListener('change', function(e) {
-        const file = e.target.files[0];
-        if (file) {
-            // 显示文件名
-            document.getElementById('mdFilename').textContent = file.name;
-            // 保存源文件名（不带扩展名）
-            mdSourceFilename = file.name.replace(/\.[^/.]+$/, "");
+    // 设置默认标签页
+    const initialTab = window.location.hash.substring(1) || 'json-to-md';
+    showTab(initialTab);
+    
+    // 设置文件输入处理
+    setupFileInputs();
+});
+
+/**
+ * 设置文件输入处理
+ */
+function setupFileInputs() {
+    // MD文件输入处理
+    const fileInputMd = document.getElementById('fileInputMd');
+    if (fileInputMd) {
+        fileInputMd.addEventListener('change', function(e) {
+            handleFileInput(e, 'inputAreaMd', file => {
+                mdSourceFilename = file.name.replace(/\.[^/.]+$/, "");
+                document.getElementById('mdFilename').textContent = file.name;
+            }, convertMdToJson); // 自动转换MD到JSON
+        });
+    }
+    
+    // JSON文件输入处理
+    const fileInputJson = document.getElementById('fileInputJson');
+    if (fileInputJson) {
+        fileInputJson.addEventListener('change', function(e) {
+            handleFileInput(e, 'inputAreaJson', file => {
+                jsonSourceFilename = file.name.replace(/\.[^/.]+$/, "");
+                document.getElementById('jsonFilename').textContent = file.name;
+            }, convertJsonToMd); // 自动转换JSON到MD
+        });
+    }
+    
+    // JSONL文件输入处理
+    const fileInputJsonl = document.getElementById('fileInputJsonl');
+    if (fileInputJsonl) {
+        fileInputJsonl.addEventListener('change', function(e) {
+            handleFileInput(e, 'inputAreaJsonl', file => {
+                document.getElementById('jsonlFilename').textContent = file.name;
+            }, convertJsonlToTxt); // 自动转换JSONL到TXT
+        });
+    }
+    
+    // 正则表达式文件输入处理
+    const fileInputRegex = document.getElementById('fileInputRegex');
+    if (fileInputRegex) {
+        fileInputRegex.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (!file) return;
             
-            // 自动加载并转换
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                document.getElementById('inputAreaMd').value = e.target.result;
-                convertMdToJson(); // 自动转换
-            };
-            reader.readAsText(file);
-        }
-    });
-    
-    document.getElementById('fileInputJson').addEventListener('change', function(e) {
-        const file = e.target.files[0];
-        if (file) {
-            // 显示文件名
-            document.getElementById('jsonFilename').textContent = file.name;
-            // 保存源文件名（不带扩展名）
-            jsonSourceFilename = file.name.replace(/\.[^/.]+$/, "");
-            
-            // 自动加载并转换
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                document.getElementById('inputAreaJson').value = e.target.result;
-                convertJsonToMd(); // 自动转换
-            };
-            reader.readAsText(file);
-        }
-    });
-    
-    // 添加JSONL文件输入变更事件处理
-    document.getElementById('fileInputJsonl').addEventListener('change', function(e) {
-        const file = e.target.files[0];
-        if (file) {
-            // 显示文件名
-            document.getElementById('jsonlFilename').textContent = file.name;
-            
-            // 自动加载并转换
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                document.getElementById('inputAreaJsonl').value = e.target.result;
-                convertJsonlToTxt(); // 自动转换
-            };
-            reader.readAsText(file);
-        }
-    });
-    
-    // 添加正则表达式文件输入变更事件处理
-    document.getElementById('fileInputRegex').addEventListener('change', function(e) {
-        const file = e.target.files[0];
-        if (file) {
             const reader = new FileReader();
             reader.onload = function(e) {
                 try {
                     const jsonData = JSON.parse(e.target.result);
                     
-                    // 检查是否是有效的正则规则
-                    if (jsonData.findRegex) {
-                        // 单个规则
-                        let regexStr = jsonData.findRegex;
-                        
-                        // 处理不同格式的正则表达式
-                        if (typeof regexStr === 'string') {
-                            regexStr = formatRegex(regexStr);
-                        }
-                        
-                        const rule = {
-                            id: generateUUID(),
-                            scriptName: jsonData.scriptName || '导入的正则',
-                            findRegex: regexStr,
-                            replaceString: jsonData.replaceString || '',
-                            placement: jsonData.placement || [],
-                            disabled: jsonData.disabled || false
-                        };
-                        regexRules.push(rule);
-                    } else if (Array.isArray(jsonData)) {
-                        // 规则数组
-                        jsonData.forEach(item => {
-                            if (item.findRegex) {
-                                let regexStr = item.findRegex;
-                                
-                                // 处理不同格式的正则表达式
-                                if (typeof regexStr === 'string') {
-                                    regexStr = formatRegex(regexStr);
-                                }
-                                
-                                const rule = {
-                                    id: generateUUID(),
-                                    scriptName: item.scriptName || '导入的正则',
-                                    findRegex: regexStr,
-                                    replaceString: item.replaceString || '',
-                                    placement: item.placement || [],
-                                    disabled: item.disabled || false
-                                };
-                                regexRules.push(rule);
-                            }
+                    // 检查是否是ST风格的正则表达式文件
+                    if (Array.isArray(jsonData)) {
+                        // 直接使用解析后的数组
+                        regexRules = jsonData.map(rule => {
+                            // 确保每个规则都有ID
+                            return { ...rule, id: rule.id || generateUUID() };
+                        });
+                    } else if (jsonData.regex && Array.isArray(jsonData.regex)) {
+                        // ST regex.json格式
+                        regexRules = jsonData.regex.map(rule => {
+                            return {
+                                id: generateUUID(),
+                                scriptName: rule.name || "导入规则",
+                                findRegex: rule.find || "",
+                                replaceString: rule.replace || "",
+                                placement: rule.target ? [rule.target] : [1, 2],
+                                disabled: false
+                            };
                         });
                     }
                     
+                    // 重新渲染规则列表
                     renderRegexRules();
+                    
+                    // 保存到缓存
+                    saveSettingsToCache();
                 } catch (error) {
-                    console.error('解析正则表达式JSON失败:', error);
-                    alert('解析正则表达式失败: ' + error.message);
+                    console.error('解析正则JSON文件失败:', error);
+                    alert('解析正则JSON文件失败: ' + error.message);
                 }
             };
             reader.readAsText(file);
+        });
+    }
+}
+
+/**
+ * 处理文件输入
+ * @param {Event} e - 文件输入事件
+ * @param {string} targetAreaId - 目标文本区域ID
+ * @param {Function} callback - 成功读取文件后的回调函数
+ * @param {Function} [autoConvert] - 自动转换函数，如果提供则在文件加载后自动调用
+ */
+function handleFileInput(e, targetAreaId, callback, autoConvert) {
+    const file = e.target.files[0];
+    if (!file) return;
+    
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        document.getElementById(targetAreaId).value = e.target.result;
+        if (callback) callback(file);
+        // 自动执行转换
+        if (autoConvert && typeof autoConvert === 'function') {
+            autoConvert();
         }
-    });
-    
-    // 添加前缀模式变更事件监听
-    document.getElementById('prefixMode').addEventListener('change', function() {
-        // 保存到缓存
-        saveSettingsToCache();
-    });
-    
-    // 初始化多语言占位符
+    };
+    reader.readAsText(file);
+}
+
+// 添加前缀模式变更事件监听
+document.getElementById('prefixMode').addEventListener('change', function() {
+    // 保存到缓存
+    saveSettingsToCache();
+});
+
+// 初始化多语言占位符
+document.querySelectorAll('[data-i18n-placeholder]').forEach(element => {
+    const key = element.getAttribute('data-i18n-placeholder');
+    const translationElement = document.querySelector(`[data-i18n="${key}"]`);
+    if (translationElement) {
+        element.placeholder = translationElement.textContent;
+    }
+});
+
+// 语言变化时更新占位符
+document.addEventListener('languageChanged', function() {
     document.querySelectorAll('[data-i18n-placeholder]').forEach(element => {
         const key = element.getAttribute('data-i18n-placeholder');
         const translationElement = document.querySelector(`[data-i18n="${key}"]`);
@@ -1263,54 +1427,40 @@ document.addEventListener('DOMContentLoaded', function() {
             element.placeholder = translationElement.textContent;
         }
     });
-    
-    // 语言变化时更新占位符
-    document.addEventListener('languageChanged', function() {
-        document.querySelectorAll('[data-i18n-placeholder]').forEach(element => {
-            const key = element.getAttribute('data-i18n-placeholder');
-            const translationElement = document.querySelector(`[data-i18n="${key}"]`);
-            if (translationElement) {
-                element.placeholder = translationElement.textContent;
-            }
-        });
-    });
+});
 
-    // 页面加载时初始化状态
-    const presetToggle = document.querySelector('.description-toggle.preset-guide');
-    const logToggle = document.querySelector('.description-toggle.log-guide');
-    
-    // 初始状态：所有指南都处于折叠状态
-    if (presetToggle) {
-        document.getElementById('presetGuideContent').classList.remove('active');
-        presetToggle.classList.remove('active');
-    }
-    
-    if (logToggle) {
-        document.getElementById('logGuideContent').classList.remove('active');
-        logToggle.classList.remove('active');
-    }
-    
-    // 根据当前选中的选项卡设置指南显示
-    const activeTab = document.querySelector('.tab.active');
-    if (activeTab) {
-        const tabId = activeTab.getAttribute('onclick').match(/'([^']+)'/)[1];
-        if (tabId === 'jsonl-to-txt') {
-            if (presetToggle) presetToggle.style.display = 'none';
-            if (logToggle) logToggle.style.display = 'flex';
-        } else {
-            if (presetToggle) presetToggle.style.display = 'flex';
-            if (logToggle) logToggle.style.display = 'none';
-        }
-    }
-    
-    // 从缓存加载设置
-    loadSettingsFromCache();
-    
-    // 如果没有正则规则（可能是首次访问），则添加默认规则
-    if (regexRules.length === 0) {
-        addDefaultRegex();
+// 页面加载时初始化状态
+const presetToggle = document.querySelector('.description-toggle.preset-guide');
+const logToggle = document.querySelector('.description-toggle.log-guide');
+
+// 初始状态：所有指南都处于折叠状态
+if (presetToggle) {
+    document.getElementById('presetGuideContent').classList.remove('active');
+    presetToggle.classList.remove('active');
+}
+
+if (logToggle) {
+    document.getElementById('logGuideContent').classList.remove('active');
+    logToggle.classList.remove('active');
+}
+
+// 根据当前选中的选项卡设置指南显示
+const activeTab = document.querySelector('.tab.active');
+if (activeTab) {
+    const tabId = activeTab.getAttribute('onclick').match(/'([^']+)'/)[1];
+    if (tabId === 'jsonl-to-txt') {
+        if (presetToggle) presetToggle.style.display = 'none';
+        if (logToggle) logToggle.style.display = 'flex';
     } else {
-        // 否则渲染已加载的规则
-        renderRegexRules();
+        if (presetToggle) presetToggle.style.display = 'flex';
+        if (logToggle) logToggle.style.display = 'none';
     }
-}); 
+}
+
+// 如果没有正则规则（可能是首次访问），则添加默认规则
+if (regexRules.length === 0) {
+    addDefaultRegex();
+} else {
+    // 否则渲染已加载的规则
+    renderRegexRules();
+} 

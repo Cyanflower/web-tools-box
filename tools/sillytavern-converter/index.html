@@ -253,6 +253,203 @@
                         </div>
                         
                         <div class="section">
+                            <div class="extended-description">
+                                <div class="description-toggle" onclick="toggleExtendedDesc('preset-config')">
+                                    <i class="fas fa-chevron-down"></i>
+                                    <span>核心配置项设置</span>
+                                </div>
+                                <div class="extended-description-content" id="presetConfigContent">
+                                    <div class="preset-config-container">
+                                        <div class="preset-config-group">
+                                            <h4>Model & Source Settings</h4>
+                                            <div class="config-item">
+                                                <label for="chat_completion_source">chat_completion_source:</label>
+                                                <input type="text" id="chat_completion_source" value="claude">
+                                            </div>
+                                            <div class="config-item">
+                                                <label for="custom_prompt_post_processing">custom_prompt_post_processing:</label>
+                                                <input type="text" id="custom_prompt_post_processing" value="strict">
+                                            </div>
+                                        </div>
+
+                                        <div class="preset-config-group">
+                                            <h4>Generation Parameters</h4>
+                                            <div class="config-item">
+                                                <label for="temperature">temperature:</label>
+                                                <input type="number" id="temperature" min="0" max="2" step="0.01" value="1">
+                                            </div>
+                                            <div class="config-item">
+                                                <label for="frequency_penalty">frequency_penalty:</label>
+                                                <input type="number" id="frequency_penalty" min="-2" max="2" step="0.01" value="0">
+                                            </div>
+                                            <div class="config-item">
+                                                <label for="presence_penalty">presence_penalty:</label>
+                                                <input type="number" id="presence_penalty" min="-2" max="2" step="0.01" value="0">
+                                            </div>
+                                            <div class="config-item">
+                                                <label for="top_p">top_p:</label>
+                                                <input type="number" id="top_p" min="0" max="1" step="0.01" value="0.95">
+                                            </div>
+                                            <div class="config-item">
+                                                <label for="top_k">top_k:</label>
+                                                <input type="number" id="top_k" min="0" max="100" step="1" value="0">
+                                            </div>
+                                            <div class="config-item">
+                                                <label for="top_a">top_a:</label>
+                                                <input type="number" id="top_a" min="0" max="1" step="0.01" value="1">
+                                            </div>
+                                            <div class="config-item">
+                                                <label for="min_p">min_p:</label>
+                                                <input type="number" id="min_p" min="0" max="1" step="0.01" value="0">
+                                            </div>
+                                            <div class="config-item">
+                                                <label for="repetition_penalty">repetition_penalty:</label>
+                                                <input type="number" id="repetition_penalty" min="0" max="2" step="0.01" value="1">
+                                            </div>
+                                        </div>
+
+                                        <div class="preset-config-group">
+                                            <h4>Context Settings</h4>
+                                            <div class="config-item">
+                                                <label for="openai_max_context">openai_max_context:</label>
+                                                <input type="number" id="openai_max_context" min="1000" max="128000" step="1000" value="128000">
+                                            </div>
+                                            <div class="config-item">
+                                                <label for="openai_max_tokens">openai_max_tokens:</label>
+                                                <input type="number" id="openai_max_tokens" min="100" max="8192" step="100" value="8192">
+                                            </div>
+                                            <div class="config-item checkbox-item">
+                                                <input type="checkbox" id="wrap_in_quotes">
+                                                <label for="wrap_in_quotes">wrap_in_quotes</label>
+                                            </div>
+                                            <div class="config-item">
+                                                <label for="names_behavior">names_behavior:</label>
+                                                <input type="number" id="names_behavior" min="-1" max="3" step="1" value="-1">
+                                            </div>
+                                        </div>
+
+                                        <div class="preset-config-group">
+                                            <h4>System Prompts</h4>
+                                            <div class="config-item">
+                                                <label for="send_if_empty">send_if_empty:</label>
+                                                <input type="text" id="send_if_empty" value="">
+                                            </div>
+                                            <div class="config-item">
+                                                <label for="impersonation_prompt">impersonation_prompt:</label>
+                                                <textarea id="impersonation_prompt">[Write your next reply from the point of view of {{user}}, using the preceding context so far as references.]</textarea>
+                                            </div>
+                                            <div class="config-item">
+                                                <label for="new_chat_prompt">new_chat_prompt:</label>
+                                                <textarea id="new_chat_prompt"></textarea>
+                                            </div>
+                                            <div class="config-item">
+                                                <label for="new_group_chat_prompt">new_group_chat_prompt:</label>
+                                                <textarea id="new_group_chat_prompt">[Start a new group chat. Group members: {{group}}]</textarea>
+                                            </div>
+                                            <div class="config-item">
+                                                <label for="new_example_chat_prompt">new_example_chat_prompt:</label>
+                                                <textarea id="new_example_chat_prompt">[Chat Example Start Point]</textarea>
+                                            </div>
+                                            <div class="config-item">
+                                                <label for="continue_nudge_prompt">continue_nudge_prompt:</label>
+                                                <textarea id="continue_nudge_prompt">[Continue the story. Do not include ANY parts of the original message. Use capitalization and punctuation as if your reply is a part of the original message: {{lastChatMessage}}]</textarea>
+                                            </div>
+                                        </div>
+
+                                        <div class="preset-config-group">
+                                            <h4>Format Settings</h4>
+                                            <div class="config-item checkbox-item">
+                                                <input type="checkbox" id="max_context_unlocked" checked>
+                                                <label for="max_context_unlocked">max_context_unlocked</label>
+                                            </div>
+                                            <div class="config-item">
+                                                <label for="wi_format">wi_format:</label>
+                                                <input type="text" id="wi_format" value="{0}\n">
+                                            </div>
+                                            <div class="config-item">
+                                                <label for="scenario_format">scenario_format:</label>
+                                                <input type="text" id="scenario_format" value="[Circumstances: {{scenario}}]">
+                                            </div>
+                                            <div class="config-item">
+                                                <label for="personality_format">personality_format:</label>
+                                                <input type="text" id="personality_format" value="[{{char}}'s personality: {{personality}}]">
+                                            </div>
+                                            <div class="config-item">
+                                                <label for="group_nudge_prompt">group_nudge_prompt:</label>
+                                                <input type="text" id="group_nudge_prompt" value="[Write the next reply only as {{char}}.]">
+                                            </div>
+                                        </div>
+
+                                        <div class="preset-config-group">
+                                            <h4>Other Settings</h4>
+                                            <div class="config-item checkbox-item">
+                                                <input type="checkbox" id="stream_openai" checked>
+                                                <label for="stream_openai">stream_openai</label>
+                                            </div>
+                                            <div class="config-item checkbox-item">
+                                                <input type="checkbox" id="show_external_models" checked>
+                                                <label for="show_external_models">show_external_models</label>
+                                            </div>
+                                            <div class="config-item">
+                                                <label for="assistant_prefill">assistant_prefill:</label>
+                                                <textarea id="assistant_prefill"></textarea>
+                                            </div>
+                                            <div class="config-item">
+                                                <label for="assistant_impersonation">assistant_impersonation:</label>
+                                                <textarea id="assistant_impersonation">I will pause other tasks and generate a 50-word logical plot from the perspective of {{user}}:\n</textarea>
+                                            </div>
+                                            <div class="config-item checkbox-item">
+                                                <input type="checkbox" id="claude_use_sysprompt" checked>
+                                                <label for="claude_use_sysprompt">claude_use_sysprompt</label>
+                                            </div>
+                                            <div class="config-item checkbox-item">
+                                                <input type="checkbox" id="use_makersuite_sysprompt" checked>
+                                                <label for="use_makersuite_sysprompt">use_makersuite_sysprompt</label>
+                                            </div>
+                                            <div class="config-item checkbox-item">
+                                                <input type="checkbox" id="use_alt_scale">
+                                                <label for="use_alt_scale">use_alt_scale</label>
+                                            </div>
+                                            <div class="config-item checkbox-item">
+                                                <input type="checkbox" id="squash_system_messages" checked>
+                                                <label for="squash_system_messages">squash_system_messages</label>
+                                            </div>
+                                            <div class="config-item checkbox-item">
+                                                <input type="checkbox" id="image_inlining">
+                                                <label for="image_inlining">image_inlining</label>
+                                            </div>
+                                            <div class="config-item">
+                                                <label for="inline_image_quality">inline_image_quality:</label>
+                                                <input type="text" id="inline_image_quality" value="low">
+                                            </div>
+                                            <div class="config-item checkbox-item">
+                                                <input type="checkbox" id="bypass_status_check">
+                                                <label for="bypass_status_check">bypass_status_check</label>
+                                            </div>
+                                            <div class="config-item checkbox-item">
+                                                <input type="checkbox" id="continue_prefill" checked>
+                                                <label for="continue_prefill">continue_prefill</label>
+                                            </div>
+                                            <div class="config-item">
+                                                <label for="continue_postfix">continue_postfix:</label>
+                                                <input type="text" id="continue_postfix" value="\n">
+                                            </div>
+                                            <div class="config-item checkbox-item">
+                                                <input type="checkbox" id="function_calling">
+                                                <label for="function_calling">function_calling</label>
+                                            </div>
+                                            <div class="config-item checkbox-item">
+                                                <input type="checkbox" id="show_thoughts" checked>
+                                                <label for="show_thoughts">show_thoughts</label>
+                                            </div>
+                                            <div class="config-item">
+                                                <label for="reasoning_effort">reasoning_effort:</label>
+                                                <input type="text" id="reasoning_effort" value="low">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                             <h3 data-i18n="conversionResult">转换结果:</h3>
                             <textarea id="resultAreaJson" class="converter-textarea" placeholder="" data-i18n-placeholder="resultWillShow" readonly></textarea>
                             <div class="actions">

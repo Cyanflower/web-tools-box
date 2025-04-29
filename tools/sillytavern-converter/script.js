@@ -1363,6 +1363,16 @@ function setupFileInputs() {
                                 disabled: false
                             };
                         });
+                    } else if (jsonData.id && jsonData.scriptName && jsonData.findRegex) {
+                        // 单个正则规则对象
+                        regexRules.push({
+                            id: jsonData.id || generateUUID(),
+                            scriptName: jsonData.scriptName || "导入规则",
+                            findRegex: jsonData.findRegex || "",
+                            replaceString: jsonData.replaceString || "",
+                            placement: Array.isArray(jsonData.placement) ? jsonData.placement : [],
+                            disabled: jsonData.disabled || false
+                        });
                     }
                     
                     // 重新渲染规则列表

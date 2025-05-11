@@ -150,7 +150,7 @@ function convertMdToSillyTavernPreset(mdContent) {
         prompts: [],
         prompt_order: [
             {
-                character_id: 100001,
+                character_id: 100001, // 始终使用100001作为角色ID
                 order: []
             }
         ],
@@ -366,13 +366,24 @@ function convertJsonToMarkdownFormat(jsonContent) {
         let mdContent = '';
         
         // 检查必要的字段
-        if (!jsonData.prompts || !jsonData.prompt_order || !jsonData.prompt_order[0] || !jsonData.prompt_order[0].order) {
+        if (!jsonData.prompts || !jsonData.prompt_order || !jsonData.prompt_order.length) {
             throw new Error('JSON格式无效：缺少必要的字段');
+        }
+        
+        // 寻找character_id为100001的prompt_order元素
+        let targetPromptOrder = jsonData.prompt_order.find(p => p.character_id === 100001);
+        
+        // 如果找不到100001，则使用第一个元素（向后兼容）
+        if (!targetPromptOrder || !targetPromptOrder.order) {
+            targetPromptOrder = jsonData.prompt_order[0];
+            if (!targetPromptOrder.order) {
+                throw new Error('JSON格式无效：prompt_order中没有有效的order字段');
+            }
         }
         
         // 获取排序信息和启用状态
         const orderMap = {};
-        jsonData.prompt_order[0].order.forEach((item, index) => {
+        targetPromptOrder.order.forEach((item, index) => {
             orderMap[item.identifier] = {
                 index: index,
                 enabled: item.enabled !== false // 默认为true
